@@ -1,0 +1,31 @@
+# =============== THƯ MỤC VÀ FILE UNITY KHÔNG CẦN THIẾT ===============
+# Unity Generated Folders
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+UserSettings/
+MemoryCaptures/
+/Assets/AssetStoreTools/ # Thư mục cache của Asset Store
+
+# Unity Generated Files
+*.unityproj
+*.suo
+*.pidb
+*.booproj
+
+# Unity Package Manager (Lock file)
+/Packages/package-lock.json
+
+# =============== FILE CẤU HÌNH VÀ TẠM THỜI CỦA IDE/HỆ ĐIỀU HÀNH ===============
+# Visual Studio / Rider / VS Code
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.user
+*.userprefs
+*.DS_Store
+Thumbs.db
