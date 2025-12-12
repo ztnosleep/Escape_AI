@@ -32,6 +32,6 @@ public class UIInGame : MonoBehaviour
     public void BackToMenu()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("SelectScene");
+        SceneManager.LoadScene("LevelSelect");
     }
 }
