@@ -17,6 +17,10 @@ public class LevelGameManager : MonoBehaviour
     [Header("Cài đặt Scene")]
     public string mainMenuName = "MainMenu";
 
+    [Header("Audio Settings")]
+    public AudioClip victorySound; 
+    private AudioSource audioSource; 
+
     [Header("UI References")]
     public TextMeshProUGUI timerText;
     public GameObject victoryPanel;
@@ -28,6 +32,11 @@ public class LevelGameManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     void Update()
@@ -49,7 +58,12 @@ public class LevelGameManager : MonoBehaviour
         if (!isGameActive) return;
 
         isGameActive = false; 
-        
+
+        if (victorySound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(victorySound);
+        }
+
         CalculateAndSaveStars();
         UnlockNextLevel();
 

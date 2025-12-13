@@ -3815,9 +3815,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c083feb28361422408ad8ab52725a761, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentLevelID: 1
   timeFor3Stars: 30
   timeFor2Stars: 60
   mainMenuName: MainMenu
+  victorySound: {fileID: 8300000, guid: 3ff296d80ce74ed4b9865019e725e29b, type: 3}
   timerText: {fileID: 1788035249}
   victoryPanel: {fileID: 971956026}
   resultStars:
@@ -12016,6 +12018,7 @@ MonoBehaviour:
   attackRate: 3
   bulletPrefab: {fileID: 8076677833827635935, guid: 3a09e25ffa883ad42bc3e4c50d0649ba, type: 3}
   targetingRange: 10
+  attackSound: {fileID: 0}
   meleeDamage: 1
   meleeKnockbackForce: 5
   meleeRange: 3.3
