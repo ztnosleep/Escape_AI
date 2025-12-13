@@ -12,15 +12,20 @@ public class ZombieAI : MonoBehaviour
 
     // Cài đặt Tốc độ và Phạm vi
     public float moveSpeed = 2f; 
-    public float attackRange = 1.5f; // Phạm vi chuyển sang trạng thái Tấn công
-    public float chaseRange = 3f;    // Phạm vi phát hiện và bắt đầu Truy đuổi
+    public float attackRange = 1.5f; 
+    public float chaseRange = 3f;    
     
+    // [THÊM MỚI] Cài đặt Âm thanh
+    [Header("Audio Settings")]
+    public AudioSource audioSource; // Kéo AudioSource của Zombie vào đây
+    public AudioClip attackSound;   // Kéo tiếng gầm/tấn công của Zombie vào đây
+
     // Logic Tránh vật cản (Raycasting)
-    public float obstacleCheckDistance = 0.5f; // Khoảng cách quét tìm vật cản
-    public LayerMask whatIsGround; // Layer chứa Tường/Nền đất (Cần thiết lập trong Inspector!)
+    public float obstacleCheckDistance = 0.5f; 
+    public LayerMask whatIsGround; 
     
     // Logic Tấn công và Tuần tra
-    public float attackDuration = 0.75f; // ĐỘ TRỄ MỚI: Gây sát thương sau 0.75 giây
+    public float attackDuration = 0.75f; 
     public float attackCooldown = 1.0f; 
     public float patrolWaitTime = 1f; 
     
@@ -36,7 +41,6 @@ public class ZombieAI : MonoBehaviour
     private float nextAttackTime = 0f; 
     private float currentWaitTime;
 
-    
     // =========================================================================
     // KHỞI TẠO
     // =========================================================================
@@ -47,6 +51,18 @@ public class ZombieAI : MonoBehaviour
         targetWaypoint = pointA;
         currentWaitTime = patrolWaitTime;
         
+        // [THÊM MỚI] Tự lấy AudioSource nếu quên kéo
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                // Nếu chưa có thì tự thêm vào để tránh lỗi
+                audioSource = gameObject.AddComponent<AudioSource>();
+                audioSource.spatialBlend = 1f; // Chỉnh thành âm thanh 3D (nghe gần thì to, xa thì nhỏ)
+            }
+        }
+
         // TÌM SCRIPT PlayerHealth
         if (player != null)
         {
@@ -55,7 +71,7 @@ public class ZombieAI : MonoBehaviour
         
         if (playerHealthScript == null)
         {
-            Debug.LogError("PlayerHealth script not found on the player object! Hãy đảm bảo PlayerHealth được đính kèm vào GameObject Player.");
+            Debug.LogError("PlayerHealth script not found on the player object!");
         }
     }
 
@@ -65,7 +81,6 @@ public class ZombieAI : MonoBehaviour
 
     void Update()
     {
-        // Kiểm tra bảo vệ lỗi
         if (player == null) return;
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
@@ -84,15 +99,13 @@ public class ZombieAI : MonoBehaviour
         else if (distanceToPlayer <= chaseRange || chaseTimer > 0)
         {
             // B. TRẠNG THÁI 2: TRUY ĐUỔI (Chase)
-            
             if (distanceToPlayer <= chaseRange)
             {
-                chaseTimer = chaseDuration; // Reset timer nếu người chơi vẫn còn trong phạm vi
+                chaseTimer = chaseDuration; 
             }
             
             if (chaseTimer > 0)
             {
-                // Sử dụng hàm di chuyển có tránh va chạm
                 MoveWithAvoidance(player.position, true);
                 chaseTimer -= Time.deltaTime;
             }
@@ -115,12 +128,8 @@ public class ZombieAI : MonoBehaviour
     void MoveWithAvoidance(Vector2 targetPosition, bool isChasing)
     {
         anim.SetBool("IsAttacking", false); 
-        
-        // 1. Lật Sprite (Quay mặt về phía đích)
         FlipSprite(targetPosition.x > transform.position.x);
 
-        // 2. KIỂM TRA VẬT CẢN TRƯỚC MẶT (Raycasting)
-        // Lấy hướng mà zombie đang nhìn
         Vector2 checkDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left; 
 
         RaycastHit2D hit = Physics2D.Raycast(
@@ -130,52 +139,43 @@ public class ZombieAI : MonoBehaviour
             whatIsGround
         );
         
-        // Vẽ Raycast để dễ dàng Debug trong Scene View
         Debug.DrawRay(transform.position, checkDirection * obstacleCheckDistance, Color.yellow);
         
         bool obstacleAhead = hit.collider != null;
 
         if (!obstacleAhead)
         {
-             // 3. DI CHUYỂN: Nếu KHÔNG có vật cản, tiếp tục di chuyển về phía đích
             transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
         }
         else if (!isChasing)
         {
-            // Nếu đang Patrol và bị chặn, buộc đổi Waypoint ngay
             HandleWaypointChange();
         }
         
-        // 4. Xử lý logic đổi Waypoint cho trạng thái Patrol (khi đến đích)
         if (!isChasing && Vector2.Distance(transform.position, targetWaypoint.position) <= 0.1f)
         {
              HandleWaypointChange();
         }
     }
 
-    // --- Phương thức Tuần tra (Sử dụng MoveWithAvoidance) ---
     void Patrol()
     {
         float distanceToWaypoint = Vector2.Distance(transform.position, targetWaypoint.position);
 
         if (distanceToWaypoint > 0.1f) 
         {
-            // Di chuyển bằng hàm có kiểm tra vật cản
             MoveWithAvoidance(targetWaypoint.position, false);
         }
         else 
         {
-            // Xử lý chờ và đổi Waypoint
             HandleWaypointChange();
         }
     }
     
-    // --- Xử lý logic đổi Waypoint ---
     void HandleWaypointChange()
     {
         if (currentWaitTime <= 0)
         {
-            // Đổi Waypoint
             targetWaypoint = (targetWaypoint == pointA) ? pointB : pointA;
             currentWaitTime = patrolWaitTime; 
         }
@@ -185,7 +185,6 @@ public class ZombieAI : MonoBehaviour
         }
     }
     
-    // --- Phương thức Hỗ trợ Lật Sprite ---
     void FlipSprite(bool movingRight)
     {
         if (movingRight)
@@ -199,26 +198,30 @@ public class ZombieAI : MonoBehaviour
     }
 
     // =========================================================================
-    // LOGIC TẤN CÔNG ĐÃ ĐƯỢC SỬA ĐỔI (Kiểm tra lại vị trí sau 0.75s)
+    // LOGIC TẤN CÔNG ĐÃ THÊM ÂM THANH
     // =========================================================================
 
     void AttackPlayer()
     {
         anim.SetBool("IsAttacking", true); 
         
+        // [THÊM MỚI] Phát tiếng Zombie Gầm/Đánh ngay khi bắt đầu Animation
+        if (audioSource != null && attackSound != null)
+        {
+            audioSource.PlayOneShot(attackSound);
+        }
+
         Invoke("ApplyDamageToPlayer", attackDuration);
-        
         Invoke("StopAttackingAnimation", attackDuration + 0.1f);
     }
 
-    // Hàm gọi trừ máu người chơi (Chỉ gây sát thương nếu người chơi vẫn trong tầm)
     void ApplyDamageToPlayer()
     {
-        // CHỈ GÂY SÁT THƯƠNG NẾU NGƯỜI CHƠI VẪN TRONG PHẠM VI TẤN CÔNG
         if (player != null && Vector2.Distance(transform.position, player.position) <= attackRange)
         {
             if (playerHealthScript != null)
             {
+                // Khi dòng này chạy, PlayerHealth sẽ tự phát tiếng "Bị thương" (Hurt Sound)
                 playerHealthScript.TakeDamage(1); 
             }
         }
