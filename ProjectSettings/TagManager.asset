@@ -7,6 +7,8 @@ TagManager:
   - Guard
   - Wall
   - Enemy
+  - Heart_1
+  - Heart_Full
   layers:
   - Default
   - TransparentFX
@@ -15,7 +17,7 @@ TagManager:
   - Water
   - UI
   - Enemy
-  - 
+  - HealthZombie
   - Player
   - 
   - 
