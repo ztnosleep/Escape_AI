@@ -108,6 +108,10 @@ public class LevelGameManager : MonoBehaviour
             PlayerPrefs.Save();
             Debug.Log("Đã lưu mở khóa màn Level ID: " + nextLevelID);
         }
+        if (CloudSaveManager.Instance != null)
+    {
+        CloudSaveManager.Instance.SaveGameData();
+    }
     }
 
     public void NextLevelButton()
