@@ -10,10 +10,12 @@ public class PlayerHealth : MonoBehaviour
 
     public Slider healthSlider; 
 
-    [Header("Cài đặt Âm thanh")] // [THÊM MỚI]
-    public AudioClip hurtSound;  // Kéo file tiếng bị thương
-    public AudioClip deathSound; // Kéo file tiếng chết
-    private AudioSource audioSource; // Biến loa
+    [Header("Cài đặt Âm thanh")]
+    public AudioClip hurtSound;
+    public AudioClip deathSound;
+    // [THÊM MỚI] Âm thanh hồi máu
+    public AudioClip healSound; 
+    private AudioSource audioSource;
 
     // Thêm các Component cần thiết
     private Animator anim;
@@ -29,11 +31,10 @@ public class PlayerHealth : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>(); 
         rb = GetComponent<Rigidbody2D>(); 
         
-        // [THÊM MỚI] Lấy AudioSource
+        // [CẬP NHẬT] Lấy AudioSource
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
-            // Nếu quên gắn AudioSource thì code tự thêm vào để tránh lỗi
             audioSource = gameObject.AddComponent<AudioSource>();
         }
         
@@ -51,6 +52,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damageAmount)
     {
+        // ... (Giữ nguyên nội dung hàm TakeDamage) ...
         if (currentHealth <= 0) return; 
 
         currentHealth -= damageAmount;
@@ -68,7 +70,7 @@ public class PlayerHealth : MonoBehaviour
         }
         else
         {
-            // [THÊM MỚI] Nếu chưa chết -> Phát tiếng bị thương
+            // Nếu chưa chết -> Phát tiếng bị thương
             PlaySound(hurtSound);
             
             // TODO: Bạn có thể thêm animation "Hurt" hoặc "Flinch" ở đây
@@ -76,9 +78,58 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    // ⭐ HÀM HỒI MÁU MỚI ⭐
+    public void Heal(int healAmount, bool fullHeal)
+    {
+        if (currentHealth >= maxHealth) return; // Đã đầy máu thì không hồi nữa
+
+        if (fullHeal)
+        {
+            currentHealth = maxHealth;
+        }
+        else
+        {
+            currentHealth += healAmount;
+            // Đảm bảo máu không vượt quá mức tối đa
+            currentHealth = Mathf.Min(currentHealth, maxHealth); 
+        }
+
+        // Cập nhật UI
+        if (healthSlider != null)
+        {
+            healthSlider.value = currentHealth;
+        }
+        
+        // Phát tiếng hồi máu
+        PlaySound(healSound);
+    }
+    
+    // ⭐ PHÁT HIỆN VA CHẠM VỚI VẬT PHẨM (Trái tim) ⭐
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        // Kiểm tra xem vật thể va chạm có tag là "Heart_1" không (Hồi 1 máu)
+        if (other.CompareTag("Heart_1")) 
+        {
+            Heal(1, false); // Hồi 1 máu
+            Destroy(other.gameObject); // Xóa vật phẩm sau khi sử dụng
+        }
+        
+        // Kiểm tra xem vật thể va chạm có tag là "Heart_Full" không (Hồi đầy máu)
+        else if (other.CompareTag("Heart_Full")) 
+        {
+            Heal(0, true); // Hồi đầy máu (tham số 0 không quan trọng khi fullHeal là true)
+            Destroy(other.gameObject); // Xóa vật phẩm sau khi sử dụng
+        }
+        
+        // **LƯU Ý:** Bạn cần đảm bảo các vật phẩm trái tim được cài đặt đúng
+        // - Có Collider2D được đặt là **Is Trigger**.
+        // - Có **Tag** tương ứng ("Heart_1" hoặc "Heart_Full").
+    }
+
+
     void Die()
     {
-        // [THÊM MỚI] Phát tiếng chết
+        // ... (Giữ nguyên nội dung hàm Die) ...
         PlaySound(deathSound);
 
         // 1. CHUYỂN TRẠNG THÁI CHẾT (Animator)
@@ -90,24 +141,23 @@ public class PlayerHealth : MonoBehaviour
         // 2. NGĂN CHẶN MỌI LỰC TÁC ĐỘNG & DI CHUYỂN
         if (rb != null)
         {
-            rb.linearVelocity = Vector2.zero;      // Dừng mọi chuyển động
-            rb.bodyType = RigidbodyType2D.Kinematic; // Ngừng tác động vật lý va chạm
-            rb.gravityScale = 0; // Không bị rơi
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.gravityScale = 0;
         }
 
         if (playerMovement != null)
         {
-            playerMovement.enabled = false; // Tắt script di chuyển
+            playerMovement.enabled = false;
         }
         if (playerCollider != null)
         {
-            playerCollider.enabled = false; // Tắt Collider
+            playerCollider.enabled = false;
         }
         
         Invoke("RestartCurrentScene", 3f); 
     }
 
-    // [THÊM MỚI] Hàm phụ trợ để phát âm thanh
     void PlaySound(AudioClip clip)
     {
         if (clip != null && audioSource != null)
