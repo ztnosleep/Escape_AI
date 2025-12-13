@@ -62,7 +62,31 @@ public class ZombieHealth : MonoBehaviour
         
         if (zombieCollider != null) zombieCollider.enabled = false;
         
-        // Hủy đối tượng sau 3 giây
-        Destroy(gameObject, 3f);
+        gameObject.SetActive(false);
+
+        // HỒI SINH SAU 5 GIÂY
+        Invoke("Respawn", 5f);
     }
+    void Respawn()
+{
+    // Reset máu và knockback
+    currentHealth = maxHealth;
+    knockbackCount = 0;
+
+    // Reset collider và rigidbody
+    if (zombieCollider != null) zombieCollider.enabled = true;
+    if (rb != null) rb.bodyType = RigidbodyType2D.Dynamic;
+
+    // Reset animation
+    if (anim != null)
+    {
+        anim.Rebind();       // Reset toàn bộ animator
+        // anim.Update(0f);
+        anim.SetBool("IsDead", false);
+    }
+
+    // Bật lại zombie
+    gameObject.SetActive(true);
+}
+
 }

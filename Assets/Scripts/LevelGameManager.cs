@@ -6,12 +6,20 @@ public class LevelGameManager : MonoBehaviour
 {
     public static LevelGameManager Instance;
 
+    [Header("Cài đặt Level")]
+    // --- SỬA 1: Thêm biến để tự điền số màn chơi (Ví dụ màn 1 điền số 1, màn 2 điền số 2) ---
+    public int currentLevelID = 1; 
+
     [Header("Cài đặt Sao")]
     public float timeFor3Stars = 30f;
     public float timeFor2Stars = 60f;
 
     [Header("Cài đặt Scene")]
-    public string mainMenuName = "MainMenu"; // Tên scene Menu chính
+    public string mainMenuName = "MainMenu";
+
+    [Header("Audio Settings")]
+    public AudioClip victorySound; 
+    private AudioSource audioSource; 
 
     [Header("UI References")]
     public TextMeshProUGUI timerText;
@@ -24,6 +32,11 @@ public class LevelGameManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     void Update()
@@ -45,14 +58,19 @@ public class LevelGameManager : MonoBehaviour
         if (!isGameActive) return;
 
         isGameActive = false; 
-        
+
+        if (victorySound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(victorySound);
+        }
+
         CalculateAndSaveStars();
         UnlockNextLevel();
 
         if (victoryPanel != null)
         {
             victoryPanel.SetActive(true);
-            Time.timeScale = 0; // Dừng game lại
+            Time.timeScale = 0;
         }
     }
 
@@ -68,8 +86,10 @@ public class LevelGameManager : MonoBehaviour
             else resultStars[i].SetActive(false);
         }
 
-        int currentLevelIndex = SceneManager.GetActiveScene().buildIndex;
-        string starKey = "Level_" + currentLevelIndex + "_Stars";
+        // --- SỬA 2: Dùng biến currentLevelID thay vì buildIndex ---
+        // Lúc này dù Scene nằm ở index 100 thì nó vẫn lưu là Level_1_Stars nếu bạn điền số 1
+        string starKey = "Level_" + currentLevelID + "_Stars";
+        
         if (starsEarned > PlayerPrefs.GetInt(starKey, 0))
         {
             PlayerPrefs.SetInt(starKey, starsEarned);
@@ -78,24 +98,23 @@ public class LevelGameManager : MonoBehaviour
 
     void UnlockNextLevel()
     {
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        int nextSceneIndex = currentSceneIndex + 1;
+        // Logic mở khóa màn tiếp theo dựa trên ID hiện tại + 1
+        int nextLevelID = currentLevelID + 1;
         int levelReached = PlayerPrefs.GetInt("levelReached", 1);
 
-        if (nextSceneIndex > levelReached)
+        if (nextLevelID > levelReached)
         {
-            PlayerPrefs.SetInt("levelReached", nextSceneIndex);
+            PlayerPrefs.SetInt("levelReached", nextLevelID);
             PlayerPrefs.Save();
-            Debug.Log("Đã lưu mở khóa màn: " + nextSceneIndex);
+            Debug.Log("Đã lưu mở khóa màn Level ID: " + nextLevelID);
         }
     }
 
-    // --- CÁC HÀM NÚT BẤM (ĐÃ BỔ SUNG) ---
-
-    // 1. Nút Tiếp Tục (Next Level)
     public void NextLevelButton()
     {
-        Time.timeScale = 1; // Mở lại thời gian
+        Time.timeScale = 1;
+        
+        // Chuyển cảnh thì vẫn dùng Build Index để load scene tiếp theo trong danh sách
         int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
 
         if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
@@ -104,18 +123,15 @@ public class LevelGameManager : MonoBehaviour
             SceneManager.LoadScene(mainMenuName);
     }
 
-    // 2. Nút Chơi Lại (Replay) - MỚI
     public void ReplayLevel()
     {
-        Time.timeScale = 1; // Quan trọng: Phải mở lại thời gian trước khi load
-        // Load lại chính Scene hiện tại
+        Time.timeScale = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // 3. Nút Về Menu (Back To Menu) - MỚI
     public void BackToMenu()
     {
-        Time.timeScale = 1; // Quan trọng: Phải mở lại thời gian
+        Time.timeScale = 1;
         SceneManager.LoadScene(mainMenuName);
     }
 }

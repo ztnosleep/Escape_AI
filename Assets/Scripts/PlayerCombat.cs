@@ -1,20 +1,23 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-// (Không cần System.Collections.IEnumerator nếu bạn dùng ForceMode2D.Impulse)
 
 public class PlayerCombat : MonoBehaviour
 {
     [Header("Attack Settings")]
     public float attackRate = 3f; 
     
-    // Đã loại bỏ bulletPrefab và targetingRange khỏi logic sử dụng (Giữ để không báo lỗi Inspector)
+    // Đã loại bỏ bulletPrefab và targetingRange khỏi logic sử dụng
     public GameObject bulletPrefab; 
     public float targetingRange = 10f; 
 
+    [Header("Audio Settings")]
+    public AudioClip attackSound; // [THÊM MỚI] Kéo file âm thanh tấn công vào đây
+    private AudioSource audioSource; // [THÊM MỚI] Biến để lấy cái loa
+
     [Header("Melee Knockback & Damage")]
-    public int meleeDamage = 1; // Sát thương gây ra khi tấn công gần
-    public float meleeKnockbackForce = 5f; // Lực đẩy
-    public float meleeRange = 1.5f; // Tầm gần tối đa để áp dụng Knockback (Nên đặt nhỏ)
+    public int meleeDamage = 1; 
+    public float meleeKnockbackForce = 5f; 
+    public float meleeRange = 1.5f; 
 
     private float nextAttackTime = 0f;
     private Animator anim;
@@ -25,7 +28,8 @@ public class PlayerCombat : MonoBehaviour
         anim = GetComponent<Animator>();
         playerMovement = GetComponent<PlayerMovement>();
         
-        // Bỏ kiểm tra Prefab nếu không dùng đạn.
+        // [THÊM MỚI] Lấy AudioSource đang nằm trên cùng GameObject này
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Gọi từ Input System khi bấm phím K
@@ -43,6 +47,9 @@ public class PlayerCombat : MonoBehaviour
         anim.SetBool("IsAttacking", true);
         Invoke(nameof(StopAttack), 0.1f);
 
+        // [THÊM MỚI] PHÁT TIẾNG TẤN CÔNG
+        PlayAttackSound();
+
         // 1. TÌM ZOMBIE GẦN NHẤT
         Transform target = FindNearestZombie();
         
@@ -51,18 +58,25 @@ public class PlayerCombat : MonoBehaviour
         {
             float distanceToTarget = Vector2.Distance(transform.position, target.position);
             
-            // Nếu kẻ thù ở quá gần (trong phạm vi cận chiến), áp dụng Knockback 
             if (distanceToTarget <= meleeRange)
             {
                 ApplyDamageAndKnockback(target.gameObject);
                 
-                // Xoay Player về phía mục tiêu khi tấn công
                 Vector2 direction = (target.position - transform.position).normalized;
                 transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
             }
         }
-        
-        // 3. BỎ BẮN: Loại bỏ logic ShootBullet
+    }
+
+    // [THÊM MỚI] Hàm xử lý phát âm thanh
+    void PlayAttackSound()
+    {
+        // Kiểm tra xem có AudioSource và File âm thanh chưa để tránh lỗi
+        if (audioSource != null && attackSound != null)
+        {
+            // PlayOneShot giúp âm thanh chồng lên nhau (không bị ngắt quãng nhạc nền)
+            audioSource.PlayOneShot(attackSound);
+        }
     }
 
     void StopAttack()
@@ -70,12 +84,10 @@ public class PlayerCombat : MonoBehaviour
         anim.SetBool("IsAttacking", false);
     }
     
-    // --- HÀM TÌM KIẾM MỤC TIÊU ---
-    // Giữ nguyên (Dùng targetingRange để quét)
+    // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
     Transform FindNearestZombie()
     {
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, targetingRange, LayerMask.GetMask("Enemy"));
-        
         Transform nearestTarget = null;
         float minDistance = float.MaxValue;
 
@@ -84,7 +96,6 @@ public class PlayerCombat : MonoBehaviour
             if (hit.CompareTag("Enemy") || hit.gameObject.layer == LayerMask.NameToLayer("Enemy")) 
             {
                 float distance = Vector2.Distance(transform.position, hit.transform.position);
-                
                 if (distance < minDistance)
                 {
                     minDistance = distance;
@@ -95,20 +106,13 @@ public class PlayerCombat : MonoBehaviour
         return nearestTarget;
     }
 
-    // --- HÀM TRỪ MÁU VÀ KNOCKBACK (ĐÃ CẬP NHẬT) ---
-    // Thay thế cho ApplyMeleeKnockback và tích hợp logic trừ máu qua ZombieHealth
     void ApplyDamageAndKnockback(GameObject enemy)
     {
-        // Lấy script quản lý máu của Zombie
         ZombieHealth zombieHealth = enemy.GetComponent<ZombieHealth>();
 
         if (zombieHealth != null)
         {
-            // Hướng đẩy là hướng từ Player ra Enemy
             Vector2 knockbackDirection = (enemy.transform.position - transform.position).normalized; 
-            
-            // GỌI HÀM TRỪ MÁU & ĐẨY LÙI TỪ ZOMBIEHEALTH
-            // Logic trừ máu, đếm 3 lần đẩy và gọi chết sẽ nằm trong ZombieHealth
             zombieHealth.TakeDamageAndKnockback(meleeDamage, knockbackDirection, meleeKnockbackForce);
         }
         else
@@ -116,7 +120,4 @@ public class PlayerCombat : MonoBehaviour
              Debug.LogWarning("Enemy " + enemy.name + " is missing ZombieHealth script!");
         }
     }
-    
-    // --- HÀM BẮN ĐÃ ĐƯỢC LOẠI BỎ/DỌN DẸP ---
-    // Loại bỏ hàm ShootBullet và CreateSimpleCircleSprite
 }
