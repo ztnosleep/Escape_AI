@@ -25,7 +25,7 @@ public class ZombieAI : MonoBehaviour
     public LayerMask whatIsGround; 
     
     // Logic Tấn công và Tuần tra
-    public float attackDuration = 0.75f; 
+    public float attackDuration = 0.5f; 
     public float attackCooldown = 1.0f; 
     public float patrolWaitTime = 1f; 
     
