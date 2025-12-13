@@ -2,29 +2,48 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform target; // Kéo thả object Player vào đây
-    public float smoothTime = 0.3f; // Thời gian để camera "bắt kịp" Player (càng nhỏ càng nhanh)
-    
-    // Đặt Z = -10 vì camera 2D luôn phải ở -10
-    private Vector3 offset = new Vector3(0f, 0f, -10f); 
-    
-    // Biến này cần cho hàm SmoothDamp (không cần chỉnh)
+    public Transform target;           // Player
+    public float smoothTime = 0.3f;
+    public BoxCollider2D mapBounds;    // Kéo MapBounds vào đây
+
+    private Vector3 offset = new Vector3(0f, 0f, -10f);
     private Vector3 velocity = Vector3.zero;
+
+    private float minX, maxX, minY, maxY;
+    private Camera cam;
+
+    void Start()
+    {
+        cam = Camera.main;
+
+        Bounds bounds = mapBounds.bounds;
+
+        float camHalfHeight = cam.orthographicSize;
+        float camHalfWidth = camHalfHeight * cam.aspect;
+
+        minX = bounds.min.x + camHalfWidth;
+        maxX = bounds.max.x - camHalfWidth;
+        minY = bounds.min.y + camHalfHeight;
+        maxY = bounds.max.y - camHalfHeight;
+    }
 
     void LateUpdate()
     {
-        if (target != null)
-        {
-            // Tính toán vị trí mong muốn
-            Vector3 targetPosition = target.position + offset;
-            
-            // Dùng SmoothDamp để di chuyển camera mượt mà
-            transform.position = Vector3.SmoothDamp(
-                transform.position, // Vị trí hiện tại
-                targetPosition,     // Vị trí muốn đến
-                ref velocity,       // Biến vận tốc (để hàm tự quản lý)
-                smoothTime          // Thời gian di chuyển
-            );
-        }
+        if (target == null) return;
+
+        Vector3 targetPosition = target.position + offset;
+
+        Vector3 smoothPos = Vector3.SmoothDamp(
+            transform.position,
+            targetPosition,
+            ref velocity,
+            smoothTime
+        );
+
+        // 🚧 Giới hạn camera trong map
+        smoothPos.x = Mathf.Clamp(smoothPos.x, minX, maxX);
+        smoothPos.y = Mathf.Clamp(smoothPos.y, minY, maxY);
+
+        transform.position = smoothPos;
     }
 }
