@@ -132,6 +132,10 @@ PrefabInstance:
       value: Guard (3)
       objectReference: {fileID: 0}
     - target: {fileID: 5465757198651728395, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
+      propertyPath: patrolSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465757198651728395, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
       propertyPath: patrolPointA
       value: 
       objectReference: {fileID: 1103188623}
@@ -1778,6 +1782,10 @@ PrefabInstance:
     - target: {fileID: 481538640967897550, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
       propertyPath: m_Name
       value: Guard (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465757198651728395, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
+      propertyPath: patrolSpeed
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5465757198651728395, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
       propertyPath: patrolPointA
@@ -4758,11 +4766,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6420969731495152588, guid: 713b2cd584dcae740b89a39268289e14, type: 3}
       propertyPath: m_Size.x
-      value: 0.0001
+      value: 3.96
       objectReference: {fileID: 0}
     - target: {fileID: 6420969731495152588, guid: 713b2cd584dcae740b89a39268289e14, type: 3}
       propertyPath: m_Offset.x
-      value: 1.62
+      value: 0.13
       objectReference: {fileID: 0}
     - target: {fileID: 6551548465834063967, guid: 713b2cd584dcae740b89a39268289e14, type: 3}
       propertyPath: m_Size.x
@@ -4949,6 +4957,10 @@ PrefabInstance:
     - target: {fileID: 481538640967897550, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
       propertyPath: m_Name
       value: Guard (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465757198651728395, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
+      propertyPath: patrolSpeed
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5465757198651728395, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
       propertyPath: patrolPointA
@@ -8054,6 +8066,10 @@ PrefabInstance:
       value: Guard (4)
       objectReference: {fileID: 0}
     - target: {fileID: 5465757198651728395, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
+      propertyPath: patrolSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465757198651728395, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
       propertyPath: patrolPointA
       value: 
       objectReference: {fileID: 104103893}
@@ -10444,7 +10460,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6420969731495152588, guid: 713b2cd584dcae740b89a39268289e14, type: 3}
       propertyPath: m_Size.x
-      value: 0.0001
+      value: 5.73
       objectReference: {fileID: 0}
     - target: {fileID: 6551548465834063967, guid: 713b2cd584dcae740b89a39268289e14, type: 3}
       propertyPath: m_Size.x
@@ -15680,6 +15696,10 @@ PrefabInstance:
       value: Guard (1)
       objectReference: {fileID: 0}
     - target: {fileID: 5465757198651728395, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
+      propertyPath: patrolSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465757198651728395, guid: e3768d560b5d51b4598bf0342b3436f0, type: 3}
       propertyPath: patrolPointA
       value: 
       objectReference: {fileID: 1488999235}
@@ -16572,6 +16592,10 @@ PrefabInstance:
       propertyPath: startOffset.x
       value: -30.2
       objectReference: {fileID: 0}
+    - target: {fileID: 604550467251018279, guid: 1e40f4df9b44a82468ecb0c786bfe4cb, type: 3}
+      propertyPath: backgroundPrefab
+      value: 
+      objectReference: {fileID: 1212344444781933622, guid: d7a20a815c487434b96c889273544bc5, type: 3}
     - target: {fileID: 901732834950486464, guid: 1e40f4df9b44a82468ecb0c786bfe4cb, type: 3}
       propertyPath: m_Name
       value: BackgroundManager
