@@ -6,7 +6,6 @@ public class ZombieHealth : MonoBehaviour
     public int maxHealth = 3;
     [SerializeField]
     private int currentHealth;
-    private int knockbackCount = 0; 
 
     [Header("Animation")]
     private Animator anim;
@@ -70,7 +69,6 @@ public class ZombieHealth : MonoBehaviour
 {
     // Reset máu và knockback
     currentHealth = maxHealth;
-    knockbackCount = 0;
 
     // Reset collider và rigidbody
     if (zombieCollider != null) zombieCollider.enabled = true;

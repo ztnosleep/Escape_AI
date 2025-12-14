@@ -79,6 +79,20 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("defense")) 
+        {
+            IncreaseMeleeDamage(1);
+            Destroy(other.gameObject);
+        }
+    }
+    public void IncreaseMeleeDamage(int amount)
+    {
+        meleeDamage += amount;
+        Debug.Log("Player Melee Damage increased! New Damage: " + meleeDamage);
+    }
+
     void StopAttack()
     {
         anim.SetBool("IsAttacking", false);
