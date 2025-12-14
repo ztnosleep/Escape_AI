@@ -9,6 +9,10 @@ TagManager:
   - Enemy
   - Heart_1
   - Heart_Full
+  - Buff
+  - Debuff
+  - defense
+  - Trap
   layers:
   - Default
   - TransparentFX

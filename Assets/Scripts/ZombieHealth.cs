@@ -4,8 +4,8 @@ public class ZombieHealth : MonoBehaviour
 {
     [Header("Health & Stats")]
     public int maxHealth = 3;
+    [SerializeField]
     private int currentHealth;
-    private int knockbackCount = 0; 
 
     [Header("Animation")]
     private Animator anim;
@@ -25,9 +25,7 @@ public class ZombieHealth : MonoBehaviour
     {
         if (currentHealth <= 0) return; // Đã chết
 
-        currentHealth -= damageAmount; // Trừ máu
-        knockbackCount++; // Tăng số lần bị đẩy lùi
-        
+        currentHealth -= damageAmount; // Trừ máu        
         // Áp dụng lực đẩy
         if (rb != null)
         {
@@ -36,7 +34,7 @@ public class ZombieHealth : MonoBehaviour
         }
 
         // KIỂM TRA ĐIỀU KIỆN CHẾT
-        if (currentHealth <= 0 || knockbackCount >= 3)
+        if (currentHealth <= 0)
         {
             Die();
         }
@@ -71,7 +69,6 @@ public class ZombieHealth : MonoBehaviour
 {
     // Reset máu và knockback
     currentHealth = maxHealth;
-    knockbackCount = 0;
 
     // Reset collider và rigidbody
     if (zombieCollider != null) zombieCollider.enabled = true;

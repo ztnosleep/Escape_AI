@@ -162,15 +162,7 @@ public class PlayerHealth : MonoBehaviour
     // PHÁT HIỆN VA CHẠM VỚI VẬT PHẨM (Trigger)
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // --- Logic Tăng Máu Tối Đa ---
-        if (other.CompareTag("defense")) 
-        {
-            IncreaseMaxHealth(1); // Tăng maxHealth lên 1 và currentHealth lên 1
-            Destroy(other.gameObject); 
-        }
-        
-        // --- Logic Hồi Máu ---
-        else if (other.CompareTag("Heart_1")) 
+        if (other.CompareTag("Heart_1")) 
         {
             Heal(1, false); // Hồi 1 máu
             Destroy(other.gameObject);

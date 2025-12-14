@@ -101,6 +101,10 @@ public class PlayerMovement : MonoBehaviour
             TriggerSpeedChange(debuffSpeedMultiplier, debuffSound);
             Destroy(other.gameObject); // Xóa vật phẩm Debuff
         }
+        else if (other.CompareTag("Trap"))
+        {
+            TriggerSpeedChange(debuffSpeedMultiplier, debuffSound);
+        }
     }
 
     // HÀM CHUNG KHỞI ĐỘNG HIỆU ỨNG TỐC ĐỘ (THÊM MỚI)
