@@ -34,6 +34,12 @@ public class PlayerMovement : MonoBehaviour
         // LƯU TỐC ĐỘ GỐC KHI BẮT ĐẦU GAME
         baseMoveSpeed = moveSpeed; 
 
+        if (GameManager.Instance != null)
+    {
+        // Giả sử mỗi cấp tăng 0.5 tốc độ
+        float bonusSpeed = (GameManager.Instance.speedLevel - 1) * 0.5f;
+        UpgradeBaseSpeed(bonusSpeed);
+    }
         // Tự động lấy AudioSource nếu chưa kéo vào (để tránh lỗi quên kéo)
         if (audioSource == null)
         {
@@ -170,6 +176,11 @@ public class PlayerMovement : MonoBehaviour
             // ShootBullet(); 
         }
     }
+    public void UpgradeBaseSpeed(float extraSpeed)
+{
+    baseMoveSpeed += extraSpeed;
+    moveSpeed = baseMoveSpeed; // Cập nhật ngay lập tức
+}
 
     // Hàm PlayOneShotSound đã được tinh gọn
     void PlayOneShotSound(AudioClip clip, float volume = 1.0f)

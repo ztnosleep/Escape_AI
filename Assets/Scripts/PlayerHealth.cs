@@ -30,6 +30,16 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
+        currentHealth = maxHealth;
+    InitializeUI();
+
+    // [THÊM MỚI] Cập nhật máu theo cấp độ từ GameManager
+    if (GameManager.Instance != null)
+    {
+        // Giả sử mỗi cấp tăng 1 máu. Cấp 1 = 3 máu (gốc). Cấp 2 = 4 máu...
+        int bonusHealth = GameManager.Instance.healthLevel - 1; 
+        IncreaseMaxHealth(bonusHealth); 
+    }
         // Khởi tạo các Component
         anim = GetComponent<Animator>();
         playerCollider = GetComponent<Collider2D>();
