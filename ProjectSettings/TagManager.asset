@@ -12,6 +12,7 @@ TagManager:
   - Buff
   - Debuff
   - defense
+  - Trap
   layers:
   - Default
   - TransparentFX
