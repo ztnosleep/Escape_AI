@@ -30,8 +30,19 @@ public class PlayerCombat : MonoBehaviour
         
         // [THÊM MỚI] Lấy AudioSource đang nằm trên cùng GameObject này
         audioSource = GetComponent<AudioSource>();
-    }
 
+        if (GameManager.Instance != null)
+    {
+        // Mỗi cấp cộng thêm 1 Damage
+        int bonusDamage = GameManager.Instance.damageLevel - 1;
+        meleeDamage += bonusDamage;
+    }
+    }
+    public void UpgradeDamage(int extraDamage)
+{
+    meleeDamage += extraDamage;
+    Debug.Log("Damage upgraded! Current Damage: " + meleeDamage);
+}
     // Gọi từ Input System khi bấm phím K
     public void OnAttack(InputValue value)
     {
