@@ -14812,6 +14812,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 8076677833827635935, guid: 3a09e25ffa883ad42bc3e4c50d0649ba, type: 3}
   targetingRange: 10
   attackSound: {fileID: 8300000, guid: 30b563a701c0d374aa8944f8d0885ce7, type: 3}
+  defenseSound: {fileID: 8300000, guid: 092fac3ac4a2cf444aab894460770104, type: 3}
   meleeDamage: 1
   meleeKnockbackForce: 5
   meleeRange: 3.3
@@ -16945,9 +16946,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6756516260814787427, guid: 36b022e1dd0fd6641ac2d53d45626bac, type: 3}
+      propertyPath: buffSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 092fac3ac4a2cf444aab894460770104, type: 3}
+    - target: {fileID: 6756516260814787427, guid: 36b022e1dd0fd6641ac2d53d45626bac, type: 3}
       propertyPath: moveSpeed
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 6756516260814787427, guid: 36b022e1dd0fd6641ac2d53d45626bac, type: 3}
+      propertyPath: trapSound
+      value: 
+      objectReference: {fileID: 8300000, guid: f47243cfcfa229845bbdd06436b75473, type: 3}
     - target: {fileID: 6756516260814787427, guid: 36b022e1dd0fd6641ac2d53d45626bac, type: 3}
       propertyPath: walkSound
       value: 
@@ -16960,6 +16969,10 @@ PrefabInstance:
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 2035997539}
+    - target: {fileID: 6756516260814787427, guid: 36b022e1dd0fd6641ac2d53d45626bac, type: 3}
+      propertyPath: debuffSound
+      value: 
+      objectReference: {fileID: 8300000, guid: f47243cfcfa229845bbdd06436b75473, type: 3}
     - target: {fileID: 6756516260814787427, guid: 36b022e1dd0fd6641ac2d53d45626bac, type: 3}
       propertyPath: buffSpeedMultiplier
       value: 1.3
