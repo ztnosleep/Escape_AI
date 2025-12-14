@@ -2,12 +2,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;  // [MỚI] Thư viện cho Slider
 using UnityEngine.Audio; // [MỚI] Thư viện cho Audio Mixer
+using TMPro;
 
 public class UIInGame : MonoBehaviour
 {
     [Header("UI References")] 
     public GameObject pausePanel;
     public Slider sfxSlider; // [MỚI] Kéo Slider chỉnh volume vào đây
+    public TextMeshProUGUI coinText;
 
     [Header("Audio Settings")]
     public AudioMixer audioMixer; // [MỚI] Kéo AudioMixer vào đây
@@ -26,7 +28,14 @@ public class UIInGame : MonoBehaviour
             SetSFXVolume(savedVolume);
         }
     }
-
+    private void Update()
+    {
+        // [THÊM MỚI] Cập nhật số tiền liên tục
+        if (coinText != null && GameManager.Instance != null)
+        {
+            coinText.text = GameManager.Instance.currentCoins.ToString();
+        }
+    }
     public void PauseGame()
     {
         if (pausePanel != null)
@@ -39,7 +48,7 @@ public class UIInGame : MonoBehaviour
             Debug.LogError("Ban chua keo Pause Panel vao Script!");
         }
     }
-
+    
     public void ResumeGame()
     {
         if (pausePanel != null)
