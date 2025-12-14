@@ -1,19 +1,24 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement; 
+using TMPro; // THÊM THƯ VIỆN CẦN THIẾT ĐỂ SỬ DỤNG TEXTMESHPRO
 
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Cài đặt Máu")]
     public int maxHealth = 3;
     private int currentHealth;
-
+    
+    // UI Slider cho thanh máu
     public Slider healthSlider; 
+
+    // [THÊM MỚI] UI Text cho giá trị HP (vd: 3/3)
+    [Header("Cài đặt UI Máu")]
+    public TextMeshProUGUI hpText; 
 
     [Header("Cài đặt Âm thanh")]
     public AudioClip hurtSound;
     public AudioClip deathSound;
-    // [THÊM MỚI] Âm thanh hồi máu
     public AudioClip healSound; 
     private AudioSource audioSource;
 
@@ -31,7 +36,7 @@ public class PlayerHealth : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>(); 
         rb = GetComponent<Rigidbody2D>(); 
         
-        // [CẬP NHẬT] Lấy AudioSource
+        // Lấy hoặc thêm AudioSource
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -43,16 +48,34 @@ public class PlayerHealth : MonoBehaviour
 
         currentHealth = maxHealth;
         
+        // Khởi tạo UI Slider và Text
+        InitializeUI();
+    }
+
+    // Hàm riêng biệt để khởi tạo UI
+    void InitializeUI()
+    {
         if (healthSlider != null)
         {
             healthSlider.maxValue = maxHealth;
             healthSlider.value = currentHealth;
         }
+        // Cập nhật giá trị HP ban đầu (ví dụ: 3/3)
+        UpdateHPText();
+    }
+
+    // HÀM CẬP NHẬT GIÁ TRỊ TEXT
+    private void UpdateHPText()
+    {
+        if (hpText != null)
+        {
+            // Định dạng: Current Health / Max Health (vd: 2/5)
+            hpText.text = currentHealth.ToString() + "/" + maxHealth.ToString();
+        }
     }
 
     public void TakeDamage(int damageAmount)
     {
-        // ... (Giữ nguyên nội dung hàm TakeDamage) ...
         if (currentHealth <= 0) return; 
 
         currentHealth -= damageAmount;
@@ -62,6 +85,7 @@ public class PlayerHealth : MonoBehaviour
         {
             healthSlider.value = currentHealth;
         }
+        UpdateHPText(); // Cập nhật Text khi mất máu
 
         // Kiểm tra điều kiện thua
         if (currentHealth <= 0)
@@ -70,18 +94,15 @@ public class PlayerHealth : MonoBehaviour
         }
         else
         {
-            // Nếu chưa chết -> Phát tiếng bị thương
             PlaySound(hurtSound);
-            
-            // TODO: Bạn có thể thêm animation "Hurt" hoặc "Flinch" ở đây
-            // if (anim != null) anim.SetTrigger("Hurt");
         }
     }
 
-    // ⭐ HÀM HỒI MÁU MỚI ⭐
+    // HÀM HỒI MÁU
     public void Heal(int healAmount, bool fullHeal)
     {
-        if (currentHealth >= maxHealth) return; // Đã đầy máu thì không hồi nữa
+        // Nếu đã đầy máu và không phải hồi đầy (fullHeal), thì thoát
+        if (currentHealth >= maxHealth && !fullHeal) return; 
 
         if (fullHeal)
         {
@@ -99,37 +120,60 @@ public class PlayerHealth : MonoBehaviour
         {
             healthSlider.value = currentHealth;
         }
+        UpdateHPText(); // Cập nhật Text khi hồi máu
         
-        // Phát tiếng hồi máu
         PlaySound(healSound);
     }
     
-    // ⭐ PHÁT HIỆN VA CHẠM VỚI VẬT PHẨM (Trái tim) ⭐
+    // HÀM TĂNG MÁU TỐI ĐA VÀ HỒI MÁU
+    public void IncreaseMaxHealth(int amount)
+    {
+        // 1. Tăng giới hạn máu tối đa
+        maxHealth += amount;
+        
+        // 2. Tăng máu hiện tại (không vượt quá giới hạn mới)
+        currentHealth += amount;
+        
+        // 3. Cập nhật thanh Slider UI (phải cập nhật MaxValue trước)
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = currentHealth;
+        }
+        
+        UpdateHPText(); // Cập nhật Text khi tăng Max Health
+
+        // 4. Phát âm thanh
+        PlaySound(healSound);
+
+        Debug.Log("Max Health increased to: " + maxHealth + ". Current Health: " + currentHealth);
+    }
+    
+    // PHÁT HIỆN VA CHẠM VỚI VẬT PHẨM (Trigger)
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Kiểm tra xem vật thể va chạm có tag là "Heart_1" không (Hồi 1 máu)
-        if (other.CompareTag("Heart_1")) 
+        // --- Logic Tăng Máu Tối Đa ---
+        if (other.CompareTag("defense")) 
+        {
+            IncreaseMaxHealth(1); // Tăng maxHealth lên 1 và currentHealth lên 1
+            Destroy(other.gameObject); 
+        }
+        
+        // --- Logic Hồi Máu ---
+        else if (other.CompareTag("Heart_1")) 
         {
             Heal(1, false); // Hồi 1 máu
-            Destroy(other.gameObject); // Xóa vật phẩm sau khi sử dụng
+            Destroy(other.gameObject);
         }
-        
-        // Kiểm tra xem vật thể va chạm có tag là "Heart_Full" không (Hồi đầy máu)
         else if (other.CompareTag("Heart_Full")) 
         {
-            Heal(0, true); // Hồi đầy máu (tham số 0 không quan trọng khi fullHeal là true)
-            Destroy(other.gameObject); // Xóa vật phẩm sau khi sử dụng
+            Heal(0, true); // Hồi đầy máu
+            Destroy(other.gameObject);
         }
-        
-        // **LƯU Ý:** Bạn cần đảm bảo các vật phẩm trái tim được cài đặt đúng
-        // - Có Collider2D được đặt là **Is Trigger**.
-        // - Có **Tag** tương ứng ("Heart_1" hoặc "Heart_Full").
     }
-
 
     void Die()
     {
-        // ... (Giữ nguyên nội dung hàm Die) ...
         PlaySound(deathSound);
 
         // 1. CHUYỂN TRẠNG THÁI CHẾT (Animator)
