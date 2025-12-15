@@ -15,7 +15,9 @@ GameObject:
   - component: {fileID: 2613074081764364876}
   - component: {fileID: 6801028774615756117}
   - component: {fileID: 2476175887755303148}
-  - component: {fileID: 8213285534971210946}
+  - component: {fileID: -5627616265323636283}
+  - component: {fileID: -8568913934899763646}
+  - component: {fileID: 743191639607603846}
   m_Layer: 0
   m_Name: zombie_1_walk_0_0
   m_TagString: Untagged
@@ -173,6 +175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24a4a8a265049f34a95d2c8580ddd187, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  alarmSound: {fileID: 0}
 --- !u!50 &6801028774615756117
 Rigidbody2D:
   serializedVersion: 5
@@ -217,10 +220,17 @@ MonoBehaviour:
   player: {fileID: 0}
   moveSpeed: 2
   attackRange: 1.5
-  patrolWaitTime: 1
+  chaseRange: 3
+  chaseMemoryTime: 3
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  audioSource: {fileID: 0}
+  attackSound: {fileID: 0}
   attackDuration: 1
   attackCooldown: 1
---- !u!114 &8213285534971210946
+  patrolWaitTime: 1
+--- !u!114 &-5627616265323636283
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -229,8 +239,78 @@ MonoBehaviour:
   m_GameObject: {fileID: 5003814090684049758}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff3bfbf61a6c38743a7722d748072cb5, type: 3}
+  m_Script: {fileID: 11500000, guid: 0f6d30f29b07028438d83e6bea39f7e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 3
-  healthSlider: {fileID: 0}
+  currentHealth: 0
+--- !u!114 &-8568913934899763646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5003814090684049758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 373b52eb9bf8c40f785bb6947a1aee66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  drawGizmos: 1
+  detailedGizmos: 0
+  startEndModifier:
+    addPoints: 0
+    exactStartPoint: 3
+    exactEndPoint: 3
+    useRaycasting: 0
+    mask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    useGraphRaycasting: 0
+  traversableTags: -1
+  tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  graphMask:
+    value: -1
+--- !u!114 &743191639607603846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5003814090684049758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6eb1402c17e84a9282a7f0f62eb584f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 5
+  radius: 0.5
+  height: 2
+  canMove: 1
+  maxSpeed: 2
+  gravity: {x: NaN, y: NaN, z: NaN}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  centerOffsetCompatibility: NaN
+  repathRateCompatibility: NaN
+  canSearchCompability: 0
+  orientation: 1
+  enableRotation: 0
+  autoRepath:
+    mode: 2
+    interval: 0.5
+    sensitivity: 10
+    maximumInterval: 2
+    visualizeSensitivity: 0
+  targetCompatibility: {fileID: 0}
+  maxAcceleration: -2.5
+  rotationSpeed: 360
+  slowdownDistance: 0.6
+  pickNextWaypointDist: 2
+  endReachedDistance: 0.2
+  alwaysDrawGizmos: 0
+  slowWhenNotFacingTarget: 1
+  whenCloseToDestination: 0
+  constrainInsideGraph: 0

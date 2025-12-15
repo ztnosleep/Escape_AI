@@ -1,211 +1,158 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using Pathfinding; // Bắt buộc cho A*
 
 public class ZombieAI : MonoBehaviour
 {
-    // --- CÁC BIẾN CÔNG KHAI CẦN THIẾT LẬP TRONG UNITY INSPECTOR ---
-    
-    // Waypoints và Người chơi
-    public Transform pointA; 
-    public Transform pointB; 
-    public Transform player; 
+    [Header("References")]
+    public Transform pointA;
+    public Transform pointB;
+    public Transform player;
 
-    // Cài đặt Tốc độ và Phạm vi
-    public float moveSpeed = 2f; 
-    public float attackRange = 1.5f; 
-    public float chaseRange = 3f;    
-    
-    // [THÊM MỚI] Cài đặt Âm thanh
-    [Header("Audio Settings")]
-    public AudioSource audioSource; // Kéo AudioSource của Zombie vào đây
-    public AudioClip attackSound;   // Kéo tiếng gầm/tấn công của Zombie vào đây
+    [Header("Settings")]
+    public float moveSpeed = 2f;
+    public float attackRange = 1.5f;
+    public float chaseRange = 20f; 
+    public float chaseMemoryTime = 3f; // Thời gian đuổi theo sau khi mất dấu
 
-    // Logic Tránh vật cản (Raycasting)
-    public float obstacleCheckDistance = 0.5f; 
-    public LayerMask whatIsGround; 
-    
-    // Logic Tấn công và Tuần tra
-    public float attackDuration = 0.5f; 
-    public float attackCooldown = 1.0f; 
-    public float patrolWaitTime = 1f; 
-    
-    // Logic Truy đuổi
-    public float chaseDuration = 2f; 
-    private float chaseTimer = 0f;  
-    
-    // --- BIẾN PRIVATE VÀ THAM CHIẾU ---
-    
+    [Header("Detection")]
+    public LayerMask obstacleLayer; // ⭐ Quan trọng: Cần gán Layer "Wall" vào đây
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip attackSound;
+
+    [Header("Attack")]
+    public float attackDuration = 0.5f;
+    public float attackCooldown = 1.5f;
+
+    [Header("Patrol")]
+    public float patrolWaitTime = 1f;
+
+    // --- CÁC BIẾN PRIVATE ---
+    private AIPath aiPath;        // Thay thế cho NavMeshAgent
     private Animator anim;
+    private PlayerHealth playerHealthScript;
+    
     private Transform targetWaypoint; 
-    private PlayerHealth playerHealthScript; 
-    private float nextAttackTime = 0f; 
+    private Vector3 lastKnownPlayerPos;
+    
+    private float chaseTimer = 0f;
+    private float nextAttackTime = 0f;
     private float currentWaitTime;
 
-    // =========================================================================
-    // KHỞI TẠO
-    // =========================================================================
-    
     void Start()
     {
         anim = GetComponent<Animator>();
         targetWaypoint = pointA;
         currentWaitTime = patrolWaitTime;
-        
-        // [THÊM MỚI] Tự lấy AudioSource nếu quên kéo
+
+        // 1. LẤY COMPONENT AIPath (Của A* Project)
+        aiPath = GetComponent<AIPath>();
+        if (aiPath == null) Debug.LogError("Thiếu component 'AIPath' trên Zombie!");
+        else aiPath.maxSpeed = moveSpeed; // Đồng bộ tốc độ
+
+        // 2. Setup Audio
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
-            if (audioSource == null)
-            {
-                // Nếu chưa có thì tự thêm vào để tránh lỗi
-                audioSource = gameObject.AddComponent<AudioSource>();
-                audioSource.spatialBlend = 1f; // Chỉnh thành âm thanh 3D (nghe gần thì to, xa thì nhỏ)
-            }
+            if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.spatialBlend = 1f; 
         }
 
-        // TÌM SCRIPT PlayerHealth
+        // 3. Setup Player
         if (player != null)
         {
             playerHealthScript = player.GetComponent<PlayerHealth>();
-        } 
-        
-        if (playerHealthScript == null)
-        {
-            Debug.LogError("PlayerHealth script not found on the player object!");
         }
     }
-
-    // =========================================================================
-    // LOGIC CẬP NHẬT TRẠNG THÁI
-    // =========================================================================
-
+    
     void Update()
     {
-        if (player == null) return;
+        if (player == null || aiPath == null) return;
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        bool canSee = CanSeePlayer(distanceToPlayer);
 
-        if (distanceToPlayer <= attackRange)
+        // --- LOGIC FSM (State Machine) ---
+
+        // 1. TRẠNG THÁI TẤN CÔNG
+        if (distanceToPlayer <= attackRange && canSee)
         {
-            // A. TRẠNG THÁI 1: TẤN CÔNG (Attack)
-            chaseTimer = chaseDuration; 
-            
+            aiPath.isStopped = true; // Dừng lại để đánh
+            aiPath.destination = transform.position; // Đảm bảo không trượt đi
+
             if (Time.time >= nextAttackTime)
             {
                 AttackPlayer();
                 nextAttackTime = Time.time + attackCooldown;
             }
-        }
-        else if (distanceToPlayer <= chaseRange || chaseTimer > 0)
-        {
-            // B. TRẠNG THÁI 2: TRUY ĐUỔI (Chase)
-            if (distanceToPlayer <= chaseRange)
-            {
-                chaseTimer = chaseDuration; 
-            }
             
-            if (chaseTimer > 0)
+            // Cập nhật vị trí lần cuối thấy player
+            lastKnownPlayerPos = player.position;
+            chaseTimer = chaseMemoryTime;
+        }
+        // 2. TRẠNG THÁI TRUY ĐUỔI (Thấy hoặc còn nhớ vị trí)
+        else if (canSee || chaseTimer > 0f)
+        {
+            aiPath.isStopped = false; // Cho phép đi
+
+            if (canSee)
             {
-                MoveWithAvoidance(player.position, true);
-                chaseTimer -= Time.deltaTime;
+                lastKnownPlayerPos = player.position;
+                chaseTimer = chaseMemoryTime; // Reset bộ nhớ nếu đang nhìn thấy
             }
             else
             {
-                Patrol(); 
+                chaseTimer -= Time.deltaTime; // Giảm thời gian nhớ nếu mất dấu
             }
+
+            // Di chuyển đến vị trí (thực hoặc vị trí nhớ)
+            aiPath.destination = lastKnownPlayerPos;
         }
+        // 3. TRẠNG THÁI TUẦN TRA
         else
         {
-            // C. TRẠNG THÁI 3: TUẦN TRA (Patrol)
+            aiPath.isStopped = false;
             Patrol();
         }
-    }
 
-    // =========================================================================
-    // LOGIC DI CHUYỂN & TRÁNH VẬT CẢN (Raycasting)
-    // =========================================================================
-
-    void MoveWithAvoidance(Vector2 targetPosition, bool isChasing)
-    {
-        anim.SetBool("IsAttacking", false); 
-        FlipSprite(targetPosition.x > transform.position.x);
-
-        Vector2 checkDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left; 
-
-        RaycastHit2D hit = Physics2D.Raycast(
-            transform.position, 
-            checkDirection, 
-            obstacleCheckDistance, 
-            whatIsGround
-        );
+        // --- XỬ LÝ ANIMATION & HÌNH ẢNH ---
         
-        Debug.DrawRay(transform.position, checkDirection * obstacleCheckDistance, Color.yellow);
-        
-        bool obstacleAhead = hit.collider != null;
+        // Flip Sprite dựa trên hướng A* muốn đi (desiredVelocity)
+        if (aiPath.desiredVelocity.x > 0.01f) FlipSprite(true);
+        else if (aiPath.desiredVelocity.x < -0.01f) FlipSprite(false);
 
-        if (!obstacleAhead)
-        {
-            transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-        }
-        else if (!isChasing)
-        {
-            HandleWaypointChange();
-        }
-        
-        if (!isChasing && Vector2.Distance(transform.position, targetWaypoint.position) <= 0.1f)
-        {
-             HandleWaypointChange();
-        }
+        // Set Animation Walk
+        // aiPath.velocity.magnitude là vận tốc thực tế
+        anim.SetBool("IsWalking", aiPath.velocity.magnitude > 0.1f);
     }
 
     void Patrol()
     {
-        float distanceToWaypoint = Vector2.Distance(transform.position, targetWaypoint.position);
+        // Gán đích đến là Waypoint
+        aiPath.destination = targetWaypoint.position;
 
-        if (distanceToWaypoint > 0.1f) 
+        // Kiểm tra xem đã đến nơi chưa (A* hỗ trợ sẵn biến reachedDestination)
+        if (aiPath.reachedDestination)
         {
-            MoveWithAvoidance(targetWaypoint.position, false);
-        }
-        else 
-        {
-            HandleWaypointChange();
-        }
-    }
-    
-    void HandleWaypointChange()
-    {
-        if (currentWaitTime <= 0)
-        {
-            targetWaypoint = (targetWaypoint == pointA) ? pointB : pointA;
-            currentWaitTime = patrolWaitTime; 
-        }
-        else
-        {
-            currentWaitTime -= Time.deltaTime; 
+            if (currentWaitTime <= 0f)
+            {
+                // Hết thời gian chờ -> Đổi điểm
+                targetWaypoint = (targetWaypoint == pointA) ? pointB : pointA;
+                currentWaitTime = patrolWaitTime;
+            }
+            else
+            {
+                // Đang chờ
+                currentWaitTime -= Time.deltaTime;
+            }
         }
     }
-    
-    void FlipSprite(bool movingRight)
-    {
-        if (movingRight)
-        {
-            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-        }
-        else
-        {
-            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-        }
-    }
-
-    // =========================================================================
-    // LOGIC TẤN CÔNG ĐÃ THÊM ÂM THANH
-    // =========================================================================
 
     void AttackPlayer()
     {
-        anim.SetBool("IsAttacking", true); 
-        
-        // [THÊM MỚI] Phát tiếng Zombie Gầm/Đánh ngay khi bắt đầu Animation
+        anim.SetBool("IsAttacking", true);
+
         if (audioSource != null && attackSound != null)
         {
             audioSource.PlayOneShot(attackSound);
@@ -217,18 +164,54 @@ public class ZombieAI : MonoBehaviour
 
     void ApplyDamageToPlayer()
     {
-        if (player != null && Vector2.Distance(transform.position, player.position) <= attackRange)
+        // Kiểm tra lại khoảng cách cho chắc chắn trước khi trừ máu
+        if (playerHealthScript != null && Vector2.Distance(transform.position, player.position) <= attackRange)
         {
-            if (playerHealthScript != null)
-            {
-                // Khi dòng này chạy, PlayerHealth sẽ tự phát tiếng "Bị thương" (Hurt Sound)
-                playerHealthScript.TakeDamage(1); 
-            }
+            playerHealthScript.TakeDamage(1);
         }
     }
-    
+
     void StopAttackingAnimation()
     {
-        anim.SetBool("IsAttacking", false); 
+        anim.SetBool("IsAttacking", false);
+        aiPath.isStopped = false; // Đánh xong thì cho phép di chuyển lại
+    }
+
+    // Kiểm tra tầm nhìn có bị tường chắn không
+    bool CanSeePlayer(float distance)
+    {
+        if (distance > chaseRange) return false;
+
+        Vector2 direction = (player.position - transform.position).normalized;
+        
+        // Bắn Raycast kiểm tra tường
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, distance, obstacleLayer);
+
+        // Nếu hit.collider != null nghĩa là trúng tường -> return false (không thấy)
+        // Nếu hit.collider == null nghĩa là đường thoáng -> return true (thấy)
+        return hit.collider == null; 
+    }
+
+    void FlipSprite(bool facingRight)
+    {
+        Vector3 scale = transform.localScale;
+        // Giữ nguyên độ lớn, chỉ đổi dấu
+        scale.x = facingRight ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
+        transform.localScale = scale;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, chaseRange);
+
+        if (pointA != null && pointB != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(pointA.position, pointB.position);
+        }
     }
 }
