@@ -15,11 +15,11 @@ public class ZombieAI : MonoBehaviour
     public float chaseMemoryTime = 3f; // Thời gian đuổi theo sau khi mất dấu
 
     [Header("Detection")]
-    public LayerMask obstacleLayer; // ⭐ Quan trọng: Cần gán Layer "Wall" vào đây
+    public LayerMask obstacleLayer; 
 
     [Header("Swarm Mechanics (Bầy đàn)")]
     public float shoutRadius = 50f; // Bán kính tiếng hét gọi bầy
-    public LayerMask zombieLayer;   // Layer của Zombie (để nhận diện đồng loại)
+    public LayerMask zombieLayer;   // Layer của Zombie (để nhận diện đồng loại)
     private bool hasShouted = false;
 
     [Header("Audio")]
@@ -35,7 +35,7 @@ public class ZombieAI : MonoBehaviour
     public float patrolWaitTime = 1f;
 
     // --- CÁC BIẾN PRIVATE ---
-    private AIPath aiPath;        // Thay thế cho NavMeshAgent
+    private AIPath aiPath;        
     private Animator anim;
     private PlayerHealth playerHealthScript;
     
@@ -80,12 +80,12 @@ public class ZombieAI : MonoBehaviour
         bool canSee = CanSeePlayer(distanceToPlayer);
 
         // --- LOGIC FSM (State Machine) ---
-        // 1. TRẠNG THÁI TẤN CÔNG
-        // 1. TẤN CÔNG
+        
+        // 1. TRẠNG THÁI TẤN CÔNG (Tối ưu nhất)
         if (distanceToPlayer <= attackRange && canSee)
         {
             aiPath.isStopped = true; 
-            aiPath.destination = transform.position;
+            aiPath.destination = transform.position; // Dừng lại
 
             if (Time.time >= nextAttackTime)
             {
@@ -93,104 +93,93 @@ public class ZombieAI : MonoBehaviour
                 nextAttackTime = Time.time + attackCooldown;
             }
             
+            // Cập nhật vị trí Player và duy trì trạng thái truy đuổi
             lastKnownPlayerPos = player.position;
-            chaseTimer = chaseMemoryTime;
+            chaseTimer = chaseMemoryTime; 
         }
-        // 2. TRUY ĐUỔI (CHASE)
+        
+        // 2. TRUY ĐUỔI (CHASE) - Dù thấy hay chỉ nhớ vị trí
         else if (canSee || chaseTimer > 0f)
         {
             aiPath.isStopped = false; 
 
-            // --- [MỚI] LOGIC KÍCH HOẠT BẦY ĐÀN ---
+            // --- LOGIC KÍCH HOẠT BẦY ĐÀN ---
             // Nếu vừa mới nhìn thấy Player và chưa hét
             if (canSee && !hasShouted)
             {
                 AlertNearbyZombies(); // Gọi đồng bọn
-                PlayAlertSound();     // Phát tiếng hú
-                hasShouted = true;    // Đánh dấu đã hét rồi
+                PlayAlertSound();     // Phát tiếng hú
+                hasShouted = true;    // Đánh dấu đã hét rồi
             }
-            // --------------------------------------
 
             if (canSee)
             {
+                // Nếu thấy Player, cập nhật vị trí và reset bộ nhớ
                 lastKnownPlayerPos = player.position;
                 chaseTimer = chaseMemoryTime; 
             }
             else
             {
+                // Nếu không thấy (chaseTimer > 0f), giảm bộ nhớ
                 chaseTimer -= Time.deltaTime; 
             }
 
+            // Đi đến vị trí cuối cùng được biết
             aiPath.destination = lastKnownPlayerPos;
         }
-        // 3. TUẦN TRA (PATROL)
+        
+        // 3. TUẦN TRA (PATROL) - Khi không thấy và hết bộ nhớ
         else
         {
             aiPath.isStopped = false;
-            hasShouted = false; // Reset lại tiếng hét để lần sau thấy lại hét tiếp
+            hasShouted = false; // Reset lại tiếng hét 
             Patrol();
         }
 
         // --- XỬ LÝ ANIMATION & HÌNH ẢNH ---
-        
-        // Flip Sprite dựa trên hướng A* muốn đi (desiredVelocity)
         if (aiPath.desiredVelocity.x > 0.01f) FlipSprite(true);
         else if (aiPath.desiredVelocity.x < -0.01f) FlipSprite(false);
 
-        // Set Animation Walk
-        // aiPath.velocity.magnitude là vận tốc thực tế
         anim.SetBool("IsWalking", aiPath.velocity.magnitude > 0.1f);
     }
+    
     void AlertNearbyZombies()
     {
-        Debug.Log("--- BẮT ĐẦU QUÉT TÌM ĐỒNG BỌN ---");
-
-        // 1. Thử quét TẤT CẢ các layer xem có chạm vào cái gì không (để test bán kính)
-        Collider2D[] allHits = Physics2D.OverlapCircleAll(transform.position, shoutRadius);
-        Debug.Log("Tổng số vật thể trong bán kính (Bất kể layer nào): " + allHits.Length);
-
-        // 2. Quét chính thức theo Layer Zombie
         Collider2D[] zombies = Physics2D.OverlapCircleAll(transform.position, shoutRadius, zombieLayer);
-        Debug.Log("Số lượng ZOMBIE tìm thấy (Theo layer " + zombieLayer.value + "): " + zombies.Length);
-
+        
         foreach (Collider2D z in zombies)
         {
-            // Kiểm tra xem có phải chính mình không
-            if (z.gameObject == gameObject) 
-            {
-                Debug.Log("- Bỏ qua: Chính là tôi.");
-                continue;
-            }
+            // Bỏ qua chính mình
+            if (z.gameObject == gameObject) continue; 
 
-            Debug.Log("- Tìm thấy object: " + z.gameObject.name);
-
-            // Thử lấy script
             ZombieAI comrade = z.GetComponent<ZombieAI>();
             
             if (comrade != null)
             {
-                Debug.Log("  -> Đã tìm thấy Script ZombieAI! Gửi lệnh!");
-                comrade.ReceiveAlert(player.position);
-            }
-            else
-            {
-                Debug.LogError("  -> LỖI: Tìm thấy Object nhưng không thấy Script ZombieAI! Kiểm tra xem Script và Collider có nằm cùng 1 GameObject không?");
+                // Gửi vị trí Player để đồng đội biết đường đến
+                comrade.ReceiveAlert(player.position); 
             }
         }
     }
+    
+    // ⭐ HÀM NHẬN CẢNH BÁO ĐÃ SỬA ĐỔI
     public void ReceiveAlert(Vector3 targetPos)
     {
-        // Nếu đang bận đánh nhau hoặc đang đuổi rồi thì thôi
-        if (chaseTimer > 0) return;
+        // Nếu zombie đang bận đánh nhau hoặc đang truy đuổi rồi thì thôi
+        // Logic này đảm bảo zombie đang Patrol sẽ chuyển sang Chase
+        if (chaseTimer > 0f) return;
+        
         Debug.Log(gameObject.name + " : Đã nghe thấy tiếng gọi! Đang chuyển sang truy đuổi.");
+        
         // Kích hoạt trạng thái đuổi
         lastKnownPlayerPos = targetPos;
-        chaseTimer = chaseMemoryTime; // Gán thời gian đuổi
+        chaseTimer = chaseMemoryTime; // Cài đặt thời gian truy đuổi
         
-        // (Tùy chọn) Đồng bọn nhận lệnh cũng có thể hú lên để tạo hiệu ứng dây chuyền
-        //PlayAlertSound(); 
-        AlertNearbyZombies();
+        // Bắt đầu di chuyển ngay lập tức
+        aiPath.isStopped = false;     
+        aiPath.destination = lastKnownPlayerPos; 
     }
+    
     void PlayAlertSound()
     {
         if (audioSource != null && alertSound != null)
@@ -198,12 +187,11 @@ public class ZombieAI : MonoBehaviour
             audioSource.PlayOneShot(alertSound);
         }
     }
+    
     void Patrol()
     {
-        // Gán đích đến là Waypoint
         aiPath.destination = targetWaypoint.position;
 
-        // Kiểm tra xem đã đến nơi chưa (A* hỗ trợ sẵn biến reachedDestination)
         if (aiPath.reachedDestination)
         {
             if (currentWaitTime <= 0f)
@@ -235,7 +223,6 @@ public class ZombieAI : MonoBehaviour
 
     void ApplyDamageToPlayer()
     {
-        // Kiểm tra lại khoảng cách cho chắc chắn trước khi trừ máu
         if (playerHealthScript != null && Vector2.Distance(transform.position, player.position) <= attackRange)
         {
             playerHealthScript.TakeDamage(1);
@@ -245,10 +232,9 @@ public class ZombieAI : MonoBehaviour
     void StopAttackingAnimation()
     {
         anim.SetBool("IsAttacking", false);
-        aiPath.isStopped = false; // Đánh xong thì cho phép di chuyển lại
+        aiPath.isStopped = false; 
     }
 
-    // Kiểm tra tầm nhìn có bị tường chắn không
     bool CanSeePlayer(float distance)
     {
         if (distance > chaseRange) return false;
@@ -258,15 +244,12 @@ public class ZombieAI : MonoBehaviour
         // Bắn Raycast kiểm tra tường
         RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, distance, obstacleLayer);
 
-        // Nếu hit.collider != null nghĩa là trúng tường -> return false (không thấy)
-        // Nếu hit.collider == null nghĩa là đường thoáng -> return true (thấy)
         return hit.collider == null; 
     }
 
     void FlipSprite(bool facingRight)
     {
         Vector3 scale = transform.localScale;
-        // Giữ nguyên độ lớn, chỉ đổi dấu
         scale.x = facingRight ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
         transform.localScale = scale;
     }
@@ -279,8 +262,8 @@ public class ZombieAI : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
 
-        Gizmos.color = new Color(1, 0.5f, 0, 1); // Màu cam (R=1, G=0.5, B=0)
-        Gizmos.DrawWireSphere(transform.position, shoutRadius);
+        Gizmos.color = new Color(1, 0.5f, 0, 1); 
+        Gizmos.DrawWireSphere(transform.position, shoutRadius); 
 
         if (pointA != null && pointB != null)
         {
