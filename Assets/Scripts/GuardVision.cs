@@ -26,7 +26,7 @@ public class GuardVision : MonoBehaviour
         if (other.CompareTag("Player") && !isDetected)
         {
             isDetected = true; // Đánh dấu đã bị bắt
-            Debug.Log("BỊ BẮT RỒI!");
+            // Debug.Log("BỊ BẮT RỒI!");
 
             // Gọi quy trình: Hú còi -> Chờ -> Reset
             StartCoroutine(PlayAlarmThenRestart());
@@ -46,7 +46,7 @@ public class GuardVision : MonoBehaviour
         // if (playerMovement != null) playerMovement.enabled = false;
 
         // 2. Chờ khoảng 1 giây (hoặc bằng độ dài file âm thanh) để người chơi nghe thấy tiếng kêu
-        yield return new WaitForSeconds(1f); 
+        yield return new WaitForSeconds(2f); 
 
         // 3. Sau khi chờ xong mới tải lại màn chơi
         string currentSceneName = SceneManager.GetActiveScene().name;

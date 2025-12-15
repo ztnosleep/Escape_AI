@@ -169,7 +169,7 @@ public class ZombieAI : MonoBehaviour
         // Logic này đảm bảo zombie đang Patrol sẽ chuyển sang Chase
         if (chaseTimer > 0f) return;
         
-        Debug.Log(gameObject.name + " : Đã nghe thấy tiếng gọi! Đang chuyển sang truy đuổi.");
+        // Debug.Log(gameObject.name + " : Đã nghe thấy tiếng gọi! Đang chuyển sang truy đuổi.");
         
         // Kích hoạt trạng thái đuổi
         lastKnownPlayerPos = targetPos;
