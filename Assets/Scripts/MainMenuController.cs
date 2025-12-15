@@ -25,10 +25,10 @@ public class MainMenuController : MonoBehaviour
     
         // 1. Tải Music
         float savedMusic = PlayerPrefs.GetFloat("SavedMusicVolume", 1f);
-        Debug.Log("Volume đã lưu: " + savedMusic);
+        // Debug.Log("Volume đã lưu: " + savedMusic);
         if (musicSlider != null)
     {
-        Debug.Log("Đã tìm thấy Slider, đang cập nhật vị trí..."); // Kiểm tra dòng này
+        // Debug.Log("Đã tìm thấy Slider, đang cập nhật vị trí..."); // Kiểm tra dòng này
         musicSlider.value = savedMusic;
         SetMusicVolume(savedMusic);
     }

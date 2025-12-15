@@ -156,7 +156,7 @@ public class PlayerHealth : MonoBehaviour
         // 4. Phát âm thanh
         PlaySound(healSound);
 
-        Debug.Log("Max Health increased to: " + maxHealth + ". Current Health: " + currentHealth);
+        // Debug.Log("Max Health increased to: " + maxHealth + ". Current Health: " + currentHealth);
     }
     
     // PHÁT HIỆN VA CHẠM VỚI VẬT PHẨM (Trigger)

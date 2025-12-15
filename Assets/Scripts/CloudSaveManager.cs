@@ -32,7 +32,7 @@ public class CloudSaveManager : MonoBehaviour
         if (!AuthenticationService.Instance.IsSignedIn)
         {
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            Debug.Log("Đã đăng nhập Cloud với ID: " + AuthenticationService.Instance.PlayerId);
+            // Debug.Log("Đã đăng nhập Cloud với ID: " + AuthenticationService.Instance.PlayerId);
         }
     }
 
