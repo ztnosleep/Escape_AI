@@ -15,11 +15,12 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Audio Settings")]
     public AudioSource audioSource; // Kéo component AudioSource vào đây
-    public AudioClip walkSound;     // Kéo file âm thanh bước chân vào đây
+    public AudioClip walkSound;     // Kéo file âm thanh bước chân vào đây
     public AudioClip shootSound;
-    // [THÊM MỚI] Âm thanh Buff/Debuff
     public AudioClip buffSound;
     public AudioClip debuffSound;
+    // ⭐ [THÊM MỚI] Âm thanh khi dính bẫy
+    public AudioClip trapSound; 
 
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
@@ -35,15 +36,19 @@ public class PlayerMovement : MonoBehaviour
         baseMoveSpeed = moveSpeed; 
 
         if (GameManager.Instance != null)
-    {
-        // Giả sử mỗi cấp tăng 0.5 tốc độ
-        float bonusSpeed = (GameManager.Instance.speedLevel - 1) * 0.5f;
-        UpgradeBaseSpeed(bonusSpeed);
-    }
-        // Tự động lấy AudioSource nếu chưa kéo vào (để tránh lỗi quên kéo)
+        {
+            float bonusSpeed = (GameManager.Instance.speedLevel - 1) * 0.5f;
+            UpgradeBaseSpeed(bonusSpeed);
+        }
+        
+        // Tự động lấy AudioSource nếu chưa kéo vào
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+            }
         }
 
         if (spriteRenderer == null)
@@ -86,28 +91,27 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // XỬ LÝ VA CHẠM TRIGGER (THÊM MỚI)
+    // XỬ LÝ VA CHẠM TRIGGER
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Buff"))
         {
-            // Bắt đầu hoặc khởi động lại Coroutine Buff
             TriggerSpeedChange(buffSpeedMultiplier, buffSound);
             Destroy(other.gameObject); // Xóa vật phẩm Buff
         }
         else if (other.CompareTag("Debuff"))
         {
-            // Bắt đầu hoặc khởi động lại Coroutine Debuff
             TriggerSpeedChange(debuffSpeedMultiplier, debuffSound);
             Destroy(other.gameObject); // Xóa vật phẩm Debuff
         }
-        else if (other.CompareTag("Trap"))
+        else if (other.CompareTag("Trap")) 
         {
-            TriggerSpeedChange(debuffSpeedMultiplier, debuffSound);
+            // ⭐ SỬ DỤNG trapSound khi chạm bẫy
+            TriggerSpeedChange(debuffSpeedMultiplier, trapSound); 
         }
     }
 
-    // HÀM CHUNG KHỞI ĐỘNG HIỆU ỨNG TỐC ĐỘ (THÊM MỚI)
+    // HÀM CHUNG KHỞI ĐỘNG HIỆU ỨNG TỐC ĐỘ (GIỮ NGUYÊN)
     void TriggerSpeedChange(float multiplier, AudioClip sound)
     {
         // Nếu Coroutine đang chạy, dừng nó lại
@@ -121,7 +125,7 @@ public class PlayerMovement : MonoBehaviour
         PlayOneShotSound(sound);
     }
 
-    // COROUTINE XỬ LÝ THỜI GIAN HIỆU LỰC (THÊM MỚI)
+    // COROUTINE XỬ LÝ THỜI GIAN HIỆU LỰC (GIỮ NGUYÊN)
     IEnumerator ChangeSpeedTemporarily(float multiplier)
     {
         // 1. Áp dụng tốc độ mới
@@ -176,11 +180,13 @@ public class PlayerMovement : MonoBehaviour
             // ShootBullet(); 
         }
     }
+    
+    // Nâng cấp tốc độ gốc (GIỮ NGUYÊN)
     public void UpgradeBaseSpeed(float extraSpeed)
-{
-    baseMoveSpeed += extraSpeed;
-    moveSpeed = baseMoveSpeed; // Cập nhật ngay lập tức
-}
+    {
+        baseMoveSpeed += extraSpeed;
+        moveSpeed = baseMoveSpeed; // Cập nhật ngay lập tức
+    }
 
     // Hàm PlayOneShotSound đã được tinh gọn
     void PlayOneShotSound(AudioClip clip, float volume = 1.0f)

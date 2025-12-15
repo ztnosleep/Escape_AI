@@ -11,8 +11,11 @@ public class PlayerCombat : MonoBehaviour
     public float targetingRange = 10f; 
 
     [Header("Audio Settings")]
-    public AudioClip attackSound; // [THÊM MỚI] Kéo file âm thanh tấn công vào đây
-    private AudioSource audioSource; // [THÊM MỚI] Biến để lấy cái loa
+    public AudioClip attackSound; // Kéo file âm thanh tấn công vào đây
+    // ⭐ [THÊM MỚI] Âm thanh khi chạm vật phẩm Defense
+    public AudioClip defenseSound; 
+    
+    private AudioSource audioSource; // Biến để lấy cái loa
 
     [Header("Melee Knockback & Damage")]
     public int meleeDamage = 1; 
@@ -28,21 +31,51 @@ public class PlayerCombat : MonoBehaviour
         anim = GetComponent<Animator>();
         playerMovement = GetComponent<PlayerMovement>();
         
-        // [THÊM MỚI] Lấy AudioSource đang nằm trên cùng GameObject này
+        // Lấy hoặc thêm AudioSource
         audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
 
         if (GameManager.Instance != null)
-    {
-        // Mỗi cấp cộng thêm 1 Damage
-        int bonusDamage = GameManager.Instance.damageLevel - 1;
-        meleeDamage += bonusDamage;
+        {
+            // Mỗi cấp cộng thêm 1 Damage
+            int bonusDamage = GameManager.Instance.damageLevel - 1;
+            meleeDamage += bonusDamage;
+        }
     }
-    }
+    
     public void UpgradeDamage(int extraDamage)
-{
-    meleeDamage += extraDamage;
-    Debug.Log("Damage upgraded! Current Damage: " + meleeDamage);
-}
+    {
+        meleeDamage += extraDamage;
+        Debug.Log("Damage upgraded! Current Damage: " + meleeDamage);
+    }
+
+    // ⭐ HÀM PHÁT HIỆN VA CHẠM VỚI VẬT PHẨM (Trigger)
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("defense")) 
+        {
+            // Gọi hàm tăng sát thương (nếu cần)
+            IncreaseMeleeDamage(1); 
+            
+            // ⭐ PHÁT ÂM THANH DEFENSE
+            PlayOneShotSound(defenseSound);
+            
+            Destroy(other.gameObject);
+        }
+    }
+
+    // Hàm PlayOneShotSound được tái sử dụng từ các script khác (nên có)
+    void PlayOneShotSound(AudioClip clip, float volume = 1.0f)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip, volume); 
+        }
+    }
+
     // Gọi từ Input System khi bấm phím K
     public void OnAttack(InputValue value)
     {
@@ -55,11 +88,14 @@ public class PlayerCombat : MonoBehaviour
 
     void Attack()
     {
+        // Kiểm tra an toàn
+        if (anim == null) { Debug.LogError("Animator component missing!"); return; } 
+
         anim.SetBool("IsAttacking", true);
         Invoke(nameof(StopAttack), 0.1f);
 
-        // [THÊM MỚI] PHÁT TIẾNG TẤN CÔNG
-        PlayAttackSound();
+        // PHÁT TIẾNG TẤN CÔNG
+        PlayOneShotSound(attackSound); // Đổi từ PlayAttackSound sang PlayOneShotSound
 
         // 1. TÌM ZOMBIE GẦN NHẤT
         Transform target = FindNearestZombie();
@@ -73,31 +109,26 @@ public class PlayerCombat : MonoBehaviour
             {
                 ApplyDamageAndKnockback(target.gameObject);
                 
+                // ⭐ Cẩn thận với đoạn code xoay:
+                // Nếu đây là game 2D top-down, xoay (rotation) này là đúng.
+                // Nếu là game 2D side-scrolling, nó có thể gây lỗi phóng to/biến dạng
+                // (như lỗi bạn đã gặp trước đây)
                 Vector2 direction = (target.position - transform.position).normalized;
                 transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
             }
         }
     }
 
-    // [THÊM MỚI] Hàm xử lý phát âm thanh
-    void PlayAttackSound()
+    // HÀM CŨ ĐƯỢC THAY BẰNG PlayOneShotSound
+    /* void PlayAttackSound()
     {
-        // Kiểm tra xem có AudioSource và File âm thanh chưa để tránh lỗi
         if (audioSource != null && attackSound != null)
         {
-            // PlayOneShot giúp âm thanh chồng lên nhau (không bị ngắt quãng nhạc nền)
             audioSource.PlayOneShot(attackSound);
         }
     }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("defense")) 
-        {
-            IncreaseMeleeDamage(1);
-            Destroy(other.gameObject);
-        }
-    }
+    */
+    
     public void IncreaseMeleeDamage(int amount)
     {
         meleeDamage += amount;
@@ -106,10 +137,13 @@ public class PlayerCombat : MonoBehaviour
 
     void StopAttack()
     {
-        anim.SetBool("IsAttacking", false);
+        if (anim != null)
+        {
+            anim.SetBool("IsAttacking", false);
+        }
     }
     
-    // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
+    // --- CÁC HÀM TÌM KIẾM/ÁP DỤNG KNOCKBACK GIỮ NGUYÊN ---
     Transform FindNearestZombie()
     {
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, targetingRange, LayerMask.GetMask("Enemy"));

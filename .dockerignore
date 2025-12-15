@@ -1,0 +1,11 @@
+# Loại trừ các file/thư mục lớn do Unity tạo ra
+Library/
+Temp/
+Obj/
+Builds/
+Logs/
+
+# Loại trừ file tạm và metadata của IDE
+*.csproj
+*.sln
+*.unityproj
