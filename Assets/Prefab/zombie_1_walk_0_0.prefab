@@ -224,9 +224,14 @@ MonoBehaviour:
   chaseMemoryTime: 3
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
+  shoutRadius: 50
+  zombieLayer:
+    serializedVersion: 2
+    m_Bits: 64
   audioSource: {fileID: 0}
   attackSound: {fileID: 0}
+  alertSound: {fileID: 8300000, guid: 56fba4b74ae4fe34f99f870f1797707c, type: 3}
   attackDuration: 1
   attackCooldown: 1
   patrolWaitTime: 1
