@@ -7032,7 +7032,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c083feb28361422408ad8ab52725a761, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLevelID: 1
+  currentLevelID: 3
   timeFor3Stars: 30
   timeFor2Stars: 60
   mainMenuName: MainMenu
