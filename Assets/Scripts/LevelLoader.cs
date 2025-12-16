@@ -10,13 +10,19 @@ public class LevelLoader : MonoBehaviour
     public Slider slider;            // Thanh trượt
     public Text progressText;        // Text %
 
-    public void LoadLevel (int sceneIndex)
+    // SỬA ĐỔI: Nhận vào số Level (1, 2, 3...) thay vì Index trong Build Settings
+    public void LoadLevel (int levelIndex)
     {
-        // Gọi Coroutine
-        StartCoroutine(LoadAsynchronously(sceneIndex));
+        // Tạo tên Scene theo công thức: "Level_" + số
+        // Ví dụ: LoadLevel(1) -> sẽ tìm scene tên "Level_1"
+        string levelName = "Level_" + levelIndex;
+
+        // Gọi Coroutine với tên Scene vừa tạo
+        StartCoroutine(LoadAsynchronously(levelName));
     }
 
-    IEnumerator LoadAsynchronously (int sceneIndex)
+    // SỬA ĐỔI: Nhận vào string (tên Scene) thay vì int
+    IEnumerator LoadAsynchronously (string sceneName)
     {
         // 1. QUAN TRỌNG NHẤT: Bật màn hình Loading lên TRƯỚC TIÊN
         if (loadingScreen != null)
@@ -24,8 +30,8 @@ public class LevelLoader : MonoBehaviour
             loadingScreen.SetActive(true);
         }
 
-        // 2. Bắt đầu tải Scene ngầm
-        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);
+        // 2. Bắt đầu tải Scene ngầm bằng TÊN SCENE
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
         
         // Ngăn không cho Scene tự bật lên ngay (để chờ thanh loading chạy)
         operation.allowSceneActivation = false;
