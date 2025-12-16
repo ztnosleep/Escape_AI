@@ -1,11 +1,16 @@
-# Loại trừ các file/thư mục lớn do Unity tạo ra
-Library/
-Temp/
-Obj/
-Builds/
-Logs/
+# Bỏ qua các thư mục hệ thống và thư mục tạm của Unity
+Library
+Temp
+Obj
+Logs
+UserSettings
+.vs
+.git
+.vscode
+.idea
 
-# Loại trừ file tạm và metadata của IDE
-*.csproj
-*.sln
-*.unityproj
+# Bỏ qua source code gốc (vì ta chỉ cần copy file đã Build)
+# Nếu bạn cần copy Assets vào container thì bỏ dòng dưới, nhưng thường Server Build không cần Assets thô.
+Assets
+Packages
+ProjectSettings
