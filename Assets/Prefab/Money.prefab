@@ -171,4 +171,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coinValue: 10
-  pickupSound: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: 329a6d8582ce971428caf77466ecc5f6, type: 3}

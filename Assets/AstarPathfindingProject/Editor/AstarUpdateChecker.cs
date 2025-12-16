@@ -158,35 +158,39 @@ namespace Pathfinding {
 		/// It must be called repeatedly to ensure that the result is processed.
 		/// Returns: True if an update check is progressing (WWW request)
 		/// </summary>
+		// static bool CheckForUpdates () {
+		// 	if (updateCheckDownload != null && updateCheckDownload.isDone) {
+		// 		if (!string.IsNullOrEmpty(updateCheckDownload.error)) {
+		// 			Debug.LogWarning("There was an error checking for updates to the A* Pathfinding Project\n" +
+		// 				"The error might disappear if you switch build target from Webplayer to Standalone because of the webplayer security emulation\nError: " +
+		// 				updateCheckDownload.error);
+		// 			updateCheckDownload = null;
+		// 			return false;
+		// 		}
+		// 	#if UNITY_2018_1_OR_NEWER
+		// 		UpdateCheckCompleted(updateCheckDownload.downloadHandler.text);
+		// 		updateCheckDownload.Dispose();
+		// 	#else
+		// 		UpdateCheckCompleted(updateCheckDownload.text);
+		// 	#endif
+		// 		updateCheckDownload = null;
+		// 	}
+
+		// 	// Check if it is time to check for updates
+		// 	// Check for updates a bit earlier if we are in play mode or have the AstarPath object in the scene
+		// 	// as then the collected statistics will be a bit more accurate
+		// 	var offsetMinutes = (Application.isPlaying && Time.time > 60) || AstarPath.active != null ? -20 : 20;
+		// 	var minutesUntilUpdate = lastUpdateCheck.AddDays(updateCheckRate).AddMinutes(offsetMinutes).Subtract(System.DateTime.UtcNow).TotalMinutes;
+		// 	if (minutesUntilUpdate < 0) {
+		// 		DownloadVersionInfo();
+		// 	}
+
+		// 	return updateCheckDownload != null || minutesUntilUpdate < 10;
+		// }
 		static bool CheckForUpdates () {
-			if (updateCheckDownload != null && updateCheckDownload.isDone) {
-				if (!string.IsNullOrEmpty(updateCheckDownload.error)) {
-					Debug.LogWarning("There was an error checking for updates to the A* Pathfinding Project\n" +
-						"The error might disappear if you switch build target from Webplayer to Standalone because of the webplayer security emulation\nError: " +
-						updateCheckDownload.error);
-					updateCheckDownload = null;
-					return false;
-				}
-#if UNITY_2018_1_OR_NEWER
-				UpdateCheckCompleted(updateCheckDownload.downloadHandler.text);
-				updateCheckDownload.Dispose();
-#else
-				UpdateCheckCompleted(updateCheckDownload.text);
-#endif
-				updateCheckDownload = null;
-			}
-
-			// Check if it is time to check for updates
-			// Check for updates a bit earlier if we are in play mode or have the AstarPath object in the scene
-			// as then the collected statistics will be a bit more accurate
-			var offsetMinutes = (Application.isPlaying && Time.time > 60) || AstarPath.active != null ? -20 : 20;
-			var minutesUntilUpdate = lastUpdateCheck.AddDays(updateCheckRate).AddMinutes(offsetMinutes).Subtract(System.DateTime.UtcNow).TotalMinutes;
-			if (minutesUntilUpdate < 0) {
-				DownloadVersionInfo();
-			}
-
-			return updateCheckDownload != null || minutesUntilUpdate < 10;
+			return false; // 🔴 TẮT update checker để tránh HTTP error
 		}
+
 
 		static void DownloadVersionInfo () {
 			var script = AstarPath.active != null ? AstarPath.active : GameObject.FindObjectOfType(typeof(AstarPath)) as AstarPath;
