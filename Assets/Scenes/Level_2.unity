@@ -25267,7 +25267,7 @@ PrefabInstance:
       objectReference: {fileID: 8300000, guid: 8f11e6c6dff34f648998879383adef08, type: 3}
     - target: {fileID: 276966658937644951, guid: 36b022e1dd0fd6641ac2d53d45626bac, type: 3}
       propertyPath: maxHealth
-      value: 100000
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 276966658937644951, guid: 36b022e1dd0fd6641ac2d53d45626bac, type: 3}
       propertyPath: deathSound
