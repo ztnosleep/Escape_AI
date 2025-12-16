@@ -7,8 +7,7 @@ public class LevelGameManager : MonoBehaviour
     public static LevelGameManager Instance;
 
     [Header("Cài đặt Level")]
-    // --- SỬA 1: Thêm biến để tự điền số màn chơi (Ví dụ màn 1 điền số 1, màn 2 điền số 2) ---
-    public int currentLevelID = 1; 
+    public int currentLevelID = 1;
 
     [Header("Cài đặt Sao")]
     public float timeFor3Stars = 30f;
@@ -18,8 +17,8 @@ public class LevelGameManager : MonoBehaviour
     public string mainMenuName = "MainMenu";
 
     [Header("Audio Settings")]
-    public AudioClip victorySound; 
-    private AudioSource audioSource; 
+    public AudioClip victorySound;
+    private AudioSource audioSource;
 
     [Header("UI References")]
     public TextMeshProUGUI timerText;
@@ -29,6 +28,9 @@ public class LevelGameManager : MonoBehaviour
     private float timer = 0;
     private bool isGameActive = true;
 
+    // [THÊM MỚI] Key để lưu thời gian tạm thời
+    private string tempTimerKey = "Temp_Current_Timer";
+
     void Awake()
     {
         Instance = this;
@@ -36,6 +38,19 @@ public class LevelGameManager : MonoBehaviour
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
+        }
+    }
+
+    void Start()
+    {
+        // [SỬA ĐỔI] Kiểm tra xem có thời gian đã lưu từ lần chết trước không
+        if (PlayerPrefs.HasKey(tempTimerKey))
+        {
+            timer = PlayerPrefs.GetFloat(tempTimerKey); // Lấy lại thời gian cũ
+        }
+        else
+        {
+            timer = 0; // Nếu không có thì bắt đầu từ 0
         }
     }
 
@@ -53,11 +68,27 @@ public class LevelGameManager : MonoBehaviour
         }
     }
 
+    // [THÊM MỚI] Hàm này gọi khi người chơi Chết, trước khi reload scene
+    public void SaveTimerBeforeDeath()
+    {
+        PlayerPrefs.SetFloat(tempTimerKey, timer);
+        PlayerPrefs.Save();
+    }
+
+    // [THÊM MỚI] Hàm này dùng để reset timer khi thoát game hoặc qua màn
+    public void ResetTempTimer()
+    {
+        PlayerPrefs.DeleteKey(tempTimerKey);
+    }
+
     public void CompleteLevel()
     {
         if (!isGameActive) return;
 
-        isGameActive = false; 
+        isGameActive = false;
+
+        // [THÊM MỚI] Hoàn thành màn chơi thì phải xóa timer tạm đi để lần sau chơi lại từ 0
+        ResetTempTimer();
 
         if (victorySound != null && audioSource != null)
         {
@@ -85,9 +116,7 @@ public class LevelGameManager : MonoBehaviour
             if (i < starsEarned) resultStars[i].SetActive(true);
             else resultStars[i].SetActive(false);
         }
-
-        // --- SỬA 2: Dùng biến currentLevelID thay vì buildIndex ---
-        // Lúc này dù Scene nằm ở index 100 thì nó vẫn lưu là Level_1_Stars nếu bạn điền số 1
+        
         string starKey = "Level_" + currentLevelID + "_Stars";
         
         if (starsEarned > PlayerPrefs.GetInt(starKey, 0))
@@ -98,7 +127,6 @@ public class LevelGameManager : MonoBehaviour
 
     void UnlockNextLevel()
     {
-        // Logic mở khóa màn tiếp theo dựa trên ID hiện tại + 1
         int nextLevelID = currentLevelID + 1;
         int levelReached = PlayerPrefs.GetInt("levelReached", 1);
 
@@ -109,16 +137,16 @@ public class LevelGameManager : MonoBehaviour
             Debug.Log("Đã lưu mở khóa màn Level ID: " + nextLevelID);
         }
         if (CloudSaveManager.Instance != null)
-    {
-        CloudSaveManager.Instance.SaveGameData();
-    }
+        {
+            CloudSaveManager.Instance.SaveGameData();
+        }
     }
 
     public void NextLevelButton()
     {
         Time.timeScale = 1;
+        ResetTempTimer(); // Xóa timer tạm
         
-        // Chuyển cảnh thì vẫn dùng Build Index để load scene tiếp theo trong danh sách
         int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
 
         if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
@@ -130,12 +158,14 @@ public class LevelGameManager : MonoBehaviour
     public void ReplayLevel()
     {
         Time.timeScale = 1;
+        ResetTempTimer(); // Chơi lại từ đầu thì phải reset timer về 0
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void BackToMenu()
     {
         Time.timeScale = 1;
+        ResetTempTimer(); // Về menu thì xóa timer tạm
         SceneManager.LoadScene(mainMenuName);
     }
 }

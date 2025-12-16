@@ -214,6 +214,11 @@ public class PlayerHealth : MonoBehaviour
 
     void RestartCurrentScene()
     {
+        if (LevelGameManager.Instance != null)
+        {
+            LevelGameManager.Instance.SaveTimerBeforeDeath();
+        }
+
         string currentSceneName = SceneManager.GetActiveScene().name;
         SceneManager.LoadScene(currentSceneName);
     }
