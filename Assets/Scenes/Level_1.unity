@@ -588,6 +588,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: alertSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 7bdc95f51ec740b4e890d3cd8ea434a5, type: 3}
+    - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: chaseRange
       value: 7
       objectReference: {fileID: 0}
@@ -614,6 +618,10 @@ PrefabInstance:
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: obstacleLayer.m_Bits
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2613074081764364876, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5003814090684049758, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: m_Name
@@ -6593,6 +6601,10 @@ PrefabInstance:
       propertyPath: whatIsGround.m_Bits
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 2613074081764364876, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5003814090684049758, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: m_Name
       value: zombie_1_walk_0_0 (1)
@@ -9409,6 +9421,10 @@ PrefabInstance:
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: whatIsGround.m_Bits
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2613074081764364876, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5003814090684049758, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: m_Name
@@ -22918,6 +22934,10 @@ PrefabInstance:
       propertyPath: whatIsGround.m_Bits
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 2613074081764364876, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5003814090684049758, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: m_Name
       value: zombie_1_walk_0_0 (3)
@@ -26036,6 +26056,10 @@ PrefabInstance:
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: obstacleLayer.m_Bits
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2613074081764364876, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5003814090684049758, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: m_Name

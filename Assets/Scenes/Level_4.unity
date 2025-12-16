@@ -563,6 +563,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -5627616265323636283, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: maxHealth
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 409987533798428047, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: m_Size.x
       value: 0.1
@@ -585,8 +589,12 @@ PrefabInstance:
       objectReference: {fileID: 1581024528}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: moveSpeed
-      value: 2
+      value: 2.6
       objectReference: {fileID: 0}
+    - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: alertSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 7bdc95f51ec740b4e890d3cd8ea434a5, type: 3}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: chaseRange
       value: 7
@@ -5300,7 +5308,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f6d30f29b07028438d83e6bea39f7e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
+  maxHealth: 6
   currentHealth: 0
 --- !u!1001 &470112798
 PrefabInstance:
@@ -6553,6 +6561,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -5627616265323636283, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: maxHealth
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 409987533798428047, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: m_Size.x
       value: 0.1
@@ -6575,7 +6587,7 @@ PrefabInstance:
       objectReference: {fileID: 1861137956}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: moveSpeed
-      value: 2
+      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: alertSound
@@ -9370,6 +9382,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -5627616265323636283, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: maxHealth
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 409987533798428047, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: m_Size.x
       value: 0.1
@@ -9392,7 +9408,7 @@ PrefabInstance:
       objectReference: {fileID: 1156697346}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: moveSpeed
-      value: 2
+      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: alertSound
@@ -10916,7 +10932,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f6d30f29b07028438d83e6bea39f7e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
+  maxHealth: 6
   currentHealth: 0
 --- !u!82 &979804947
 AudioSource:
@@ -12254,7 +12270,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d952497bf90b1ad46b20f0c6d659552f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  backgroundPrefab: {fileID: 1212344444781933622, guid: d7a20a815c487434b96c889273544bc5, type: 3}
+  backgroundPrefab: {fileID: 4595259457175648369, guid: b0fc6d1872f87e74ab2b39a607799175, type: 3}
   width: 70
   height: 70
   tileSize: 1
@@ -13498,7 +13514,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f6d30f29b07028438d83e6bea39f7e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
+  maxHealth: 6
   currentHealth: 0
 --- !u!82 &1335928372
 AudioSource:
@@ -18219,7 +18235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f6d30f29b07028438d83e6bea39f7e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
+  maxHealth: 6
   currentHealth: 0
 --- !u!82 &1758442688
 AudioSource:
@@ -20548,7 +20564,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f6d30f29b07028438d83e6bea39f7e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
+  maxHealth: 6
   currentHealth: 0
 --- !u!82 &1844520658
 AudioSource:
@@ -22721,6 +22737,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -5627616265323636283, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: maxHealth
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 409987533798428047, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: m_Size.x
       value: 0.1
@@ -22743,7 +22763,7 @@ PrefabInstance:
       objectReference: {fileID: 1192195297}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: moveSpeed
-      value: 2
+      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: alertSound
@@ -25828,6 +25848,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -5627616265323636283, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
+      propertyPath: maxHealth
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 409987533798428047, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: m_Size.x
       value: 0.1
@@ -25850,7 +25874,7 @@ PrefabInstance:
       objectReference: {fileID: 830809272}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: moveSpeed
-      value: 2
+      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 2476175887755303148, guid: a5f6dac2714d7884ca5ac4fbb5192529, type: 3}
       propertyPath: alertSound
